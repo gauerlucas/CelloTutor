@@ -39,8 +39,40 @@ export interface Seance {
   dureePrevueMin: number;
   dureeReelleMin: number;
   energie: 'fatigue' | 'normal' | 'forme';
-  blocs: { id: string; fait: boolean }[];
+  blocs: { id: string; titre: string; minutes: number; fait: boolean; cible?: string; type?: string }[];
   ressenti?: 1 | 2 | 3;
+}
+
+export interface Jour {
+  minutes: number;
+  reponses: number;
+  justes: number;
+  msTotal: number;
+}
+
+export interface DoigteNote {
+  corde: number;
+  position: string;
+  doigt: string;
+}
+
+/** Ce que l'utilisateur a ajusté ou évalué sur un morceau. */
+export interface EtatMorceau {
+  /** Doigtés corrigés à la main, par indice de note jouée. */
+  doigtes: Record<number, DoigteNote>;
+  /** Numéros des mesures qui commencent un passage (sinon découpage automatique par 4). */
+  coupures?: number[];
+  /** Niveau atteint par passage : 0 découvert, 1 lent, 2 au tempo, 3 mémorisé. */
+  passages: Record<number, number>;
+  tempo?: number;
+  cle?: 'fa' | 'ut' | 'sol' | 'origine';
+}
+
+export interface MorceauImporte {
+  titre: string;
+  compositeur: string;
+  xml: string;
+  ajouteLe: number;
 }
 
 export interface Etat {
@@ -48,8 +80,12 @@ export interface Etat {
   majLe: number; // horodatage de la dernière modification
   reglages: Reglages;
   items: Record<string, ItemRevision>;
+  records: Record<string, { valeur: number; le: number }>;
+  jours: Record<string, Jour>;
   objectifs: Objectif[];
   seances: Seance[];
+  morceaux: Record<string, EtatMorceau>;
+  importes: Record<string, MorceauImporte>;
 }
 
 export const REGLAGES_DEFAUT: Reglages = {
@@ -66,6 +102,10 @@ export function etatInitial(maintenant = Date.now()): Etat {
     majLe: maintenant,
     reglages: { ...REGLAGES_DEFAUT },
     items: {},
+    records: {},
+    jours: {},
+    morceaux: {},
+    importes: {},
     objectifs: [
       { morceauId: 'gluck-melodie', etat: 'actif', depuis: maintenant },
       { morceauId: 'faure-apres-un-reve', etat: 'actif', depuis: maintenant },
@@ -99,6 +139,10 @@ export function normaliser(brut: unknown): Etat | null {
     majLe: typeof brut.majLe === 'number' ? brut.majLe : 0,
     reglages: r,
     items: estObjet(brut.items) ? (brut.items as Record<string, ItemRevision>) : {},
+    records: estObjet(brut.records) ? (brut.records as Etat['records']) : {},
+    jours: estObjet(brut.jours) ? (brut.jours as Record<string, Jour>) : {},
+    morceaux: estObjet(brut.morceaux) ? (brut.morceaux as Record<string, EtatMorceau>) : {},
+    importes: estObjet(brut.importes) ? (brut.importes as Record<string, MorceauImporte>) : {},
     objectifs: Array.isArray(brut.objectifs) ? (brut.objectifs as Objectif[]) : base.objectifs,
     seances: Array.isArray(brut.seances) ? (brut.seances as Seance[]) : [],
   };
