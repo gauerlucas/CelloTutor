@@ -9,7 +9,8 @@
   import { choixSurCorde, courtPosition, demiTonsDe, doigtesMorceau, type Doigte } from '../lib/morceaux/doigte';
   import { competencesDe, decouper, NIVEAUX, preparation, reperesDe, SEUIL_PRET } from '../lib/morceaux/passages';
   import { graver, preparerXml, type Gravure } from '../lib/morceaux/rendu';
-  import { etatDe } from '../lib/morceaux/suivi';
+  import { correctionsDe, correctionsEcriture, etatDe } from '../lib/morceaux/suivi';
+  import { suggererTransposition, TRANSPOSITIONS, type Suggestion } from '../lib/morceaux/transposition';
   import { clic, couperSuite, jouer, maintenantAudio } from '../lib/audio/son';
   import { candidats } from '../lib/morceaux/doigte';
   import { CORDES } from '../lib/musique/violoncelle';
@@ -32,7 +33,7 @@
   let erreurGravure = $state('');
   const erreur = $derived(lu.err || erreurGravure);
   const suivi = $derived(stockage.etat.morceaux[fiche.id]);
-  const corrections = $derived(suivi?.doigtes ?? {});
+  const corrections = $derived(correctionsDe(suivi));
   const doigtes = $derived<Doigte[]>(partition ? doigtesMorceau(partition.notes, fiche.doigtes ?? null, corrections) : []);
   const passages = $derived(partition ? decouper(partition.mesures, partition.notes, suivi?.coupures) : []);
   const style = $derived(stockage.etat.reglages.nomsNotes);
@@ -52,6 +53,30 @@
     f(etatDe(stockage.etat, fiche.id));
     stockage.modifie();
   }
+
+  // ------------------------------------------------------------- transposition
+  const transposition = $derived(suivi?.transposition ?? 0);
+  let suggestions = $state<Suggestion[] | null>(null);
+  function transposer(n: number) {
+    if (joue) arreter();
+    memoriser((s) => {
+      if (n) s.transposition = n;
+      else delete s.transposition;
+    });
+    // Une version plus grave se lit mieux dans une clé plus grave : on la propose d'office.
+    if (n < 0 && cle === 'origine') {
+      const ms = analyser(fiche.xmlOrigine ?? fiche.xml).notes.map((x) => x.midi + n).sort((a, b) => a - b);
+      const haut = ms[ms.length - 1]!, milieu = ms[Math.floor(ms.length / 2)]!;
+      if (haut <= 67) cle = 'fa';
+      else if (milieu <= 64) cle = 'ut';
+      memoriser((s) => (s.cle = cle));
+    }
+  }
+  function suggerer() {
+    const origine = analyser(fiche.xmlOrigine ?? fiche.xml);
+    suggestions = suggererTransposition(origine.notes).slice(0, 3);
+  }
+  const libelleTransposition = (n: number) => TRANSPOSITIONS.find((t) => t.demiTons === n)?.libelle ?? `${n > 0 ? '+' : ''}${n} demi-tons`;
 
   // ------------------------------------------------------------- gravure
   let largeur = $state(0);
@@ -308,12 +333,12 @@
   function choisirDoigte(d: Doigte) {
     if (selection == null) return;
     const i = selection;
-    memoriser((s) => (s.doigtes[i] = { corde: d.corde, position: d.position, doigt: d.doigt }));
+    memoriser((s) => (correctionsEcriture(s)[i] = { corde: d.corde, position: d.position, doigt: d.doigt }));
   }
   function retablir() {
     if (selection == null) return;
     const i = selection;
-    memoriser((s) => delete s.doigtes[i]);
+    memoriser((s) => delete correctionsEcriture(s)[i]);
   }
   const libelleDoigte = (d: Doigte | undefined) =>
     !d ? '' : d.doigt === '0' ? `corde de ${CORDES[d.corde]!.nom} à vide` : `${d.doigt === 'p' ? 'pouce' : `doigt ${d.doigt}`}, ${courtPosition(d.position)}, corde de ${CORDES[d.corde]!.nom}`;
@@ -353,7 +378,7 @@
       <div class="entete">
         <div>
           <h1>{fiche.titre}</h1>
-          <p class="discret">{fiche.compositeur} · {nomTonalite(partition.quintes, partition.mode)} · {partition.temps}/{partition.unite} · {partition.mesures.length} mesures</p>
+          <p class="discret">{fiche.compositeur} · {nomTonalite(partition.quintes, partition.mode)} · {partition.temps}/{partition.unite} · {partition.mesures.length} mesures{transposition ? ` · transposé : ${libelleTransposition(transposition).toLowerCase()}` : ''}</p>
         </div>
       </div>
 
@@ -379,6 +404,25 @@
           {/each}
         </div>
         <label class="case"><input type="checkbox" bind:checked={positions} /> Positions écrites aux démanchés</label>
+      </div>
+      <div class="barre">
+        <label class="transpo">
+          <span>Transposer</span>
+          <select value={transposition} onchange={(e) => transposer(Number(e.currentTarget.value))}>
+            {#each TRANSPOSITIONS as t (t.demiTons)}<option value={t.demiTons}>{t.libelle}</option>{/each}
+          </select>
+        </label>
+        <button class="btn discret-btn" onclick={suggerer}>Suggérer, au plus près de la 1re position</button>
+        {#if suggestions}
+          <span class="suggestions">
+            {#each suggestions as sg (sg.demiTons)}
+              <button class="btn discret-btn" aria-pressed={transposition === sg.demiTons} onclick={() => transposer(sg.demiTons)}
+                title={`Position la plus haute : ${sg.plusHaute}`}>
+                {libelleTransposition(sg.demiTons)} · {sg.aigues} % au-delà de la 4e
+              </button>
+            {/each}
+          </span>
+        {/if}
         <span class="discret aide">Touche une note pour l’entendre et voir son doigté. Espace : lecture / arrêt ; ← → : note par note.</span>
       </div>
 
@@ -413,6 +457,7 @@
         <div class="carte conseil">
           <p class="etiquette">Mesure {mesureFocus} · {conseil.t}</p>
           <p>{conseil.txt}</p>
+          {#if transposition}<p class="discret">Ce conseil décrit la version d’origine : notes et positions diffèrent dans la version transposée.</p>{/if}
         </div>
       {/if}
 
@@ -467,7 +512,7 @@
             {/each}
           </div>
           <div class="actions">
-            {#if corrections[selection!]}<button class="btn discret-btn" onclick={retablir}>Rétablir le doigté d’origine</button>{/if}
+            {#if corrections[selection!]}<button class="btn discret-btn" onclick={retablir}>Rétablir le doigté proposé</button>{/if}
             <button class="btn discret-btn" onclick={couperIci}>
               {debutsPassages.has(noteSel.mesure) && noteSel.mesure !== 1 ? `Ne plus couper à la mesure ${noteSel.mesure}` : `Commencer un passage à la mesure ${noteSel.mesure}`}
             </button>
@@ -493,6 +538,10 @@
   .case input { width: 17px; height: 17px; accent-color: var(--accent); }
   .temps { font: .9rem var(--f-mono); color: var(--ink-soft); }
   .aide { font-size: .85rem; }
+  .transpo { display: inline-flex; align-items: center; gap: .5rem; }
+  .transpo select { font: inherit; padding: .3em .5em; border-radius: 6px; border: 1px solid var(--rule); background: var(--surface); color: var(--ink); }
+  .suggestions { display: inline-flex; flex-wrap: wrap; gap: .4rem; }
+  .suggestions .btn[aria-pressed='true'] { border-color: var(--accent); background: var(--accent-soft); }
   .partition { position: relative; background: #fbf8f1; border: 1px solid var(--rule); border-radius: 10px; padding: .4rem;
     height: calc(100vh - 16rem); min-height: 380px; overflow-y: scroll; color: #1d1a16; }
   .partition :global(svg) { display: block; width: 100%; height: auto; }

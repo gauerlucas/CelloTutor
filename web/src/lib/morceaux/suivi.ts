@@ -1,7 +1,7 @@
 // Suivi des morceaux : état de travail par morceau, objectifs (actif, en pause, abandonné),
 // import d'une partition MusicXML (.musicxml, .xml ou .mxl compressé).
 
-import type { Etat, EtatMorceau, EtatObjectif } from '../etat';
+import type { DoigteNote, Etat, EtatMorceau, EtatObjectif } from '../etat';
 import { analyser } from './partition';
 
 export function etatDe(etat: Etat, id: string): EtatMorceau {
@@ -92,4 +92,17 @@ export async function lireFichierPartition(f: File): Promise<string> {
   const xml = (racine && fichiers.get(racine)) ?? [...fichiers.entries()].find(([n]) => !n.startsWith('META-INF/'))?.[1];
   if (!xml) throw new Error('Aucune partition trouvée dans l’archive .mxl.');
   return xml;
+}
+
+/** Doigtés corrigés de la version jouée (d'origine ou transposée). */
+export function correctionsDe(s: EtatMorceau | undefined): Record<number, DoigteNote> {
+  if (!s) return {};
+  return s.transposition ? s.doigtesT?.[String(s.transposition)] ?? {} : s.doigtes;
+}
+
+/** Même chose, en créant la table si besoin (pour écrire une correction). */
+export function correctionsEcriture(s: EtatMorceau): Record<number, DoigteNote> {
+  if (!s.transposition) return s.doigtes;
+  s.doigtesT ??= {};
+  return (s.doigtesT[String(s.transposition)] ??= {});
 }

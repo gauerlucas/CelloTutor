@@ -6,6 +6,7 @@ import gluckDoigtes from '../../../contenu/morceaux/gluck-melodie/doigtes.json';
 import faureXml from '../../../contenu/morceaux/faure-apres-un-reve/partition.musicxml?raw';
 import type { Etat } from './etat';
 import type { DoigteFourni } from './morceaux/doigte';
+import { transposerXml } from './morceaux/transposition';
 
 export interface Conseil {
   t: string;
@@ -25,6 +26,10 @@ export interface FicheMorceau {
   /** Conseils par mesure (numéro de mesure → conseil). */
   conseils?: Record<string, Conseil>;
   importe?: boolean;
+  /** Partition d'origine quand la fiche est transposée. */
+  xmlOrigine?: string;
+  /** Transposition appliquée (demi-tons). */
+  transposition?: number;
 }
 
 export const CATALOGUE: FicheMorceau[] = [
@@ -48,13 +53,28 @@ export const CATALOGUE: FicheMorceau[] = [
   },
 ];
 
-/** Fiche d'un morceau, qu'il soit fourni ou importé. */
+const cacheTranspositions = new Map<string, { source: string; xml: string }>();
+
+/** Fiche d'un morceau, fourni ou importé, transposée si l'utilisateur l'a demandé. */
 export function ficheMorceau(id: string, etat?: Etat): FicheMorceau | undefined {
-  const f = CATALOGUE.find((m) => m.id === id);
-  if (f || !etat) return f;
-  const imp = etat.importes[id];
-  return imp ? { id, titre: imp.titre, compositeur: imp.compositeur, tonalite: '', source: 'Importé', xml: imp.xml, importe: true } : undefined;
+  const imp = etat?.importes[id];
+  const f = CATALOGUE.find((m) => m.id === id)
+    ?? (imp ? { id, titre: imp.titre, compositeur: imp.compositeur, tonalite: '', source: 'Importé', xml: imp.xml, importe: true } : undefined);
+  const t = etat?.morceaux[id]?.transposition ?? 0;
+  if (!f || !t) return f;
+  const cle = `${id}|${t}`;
+  let c = cacheTranspositions.get(cle);
+  if (!c || c.source !== f.xml) {
+    try {
+      c = { source: f.xml, xml: transposerXml(f.xml, t) };
+    } catch {
+      return f;
+    }
+    cacheTranspositions.set(cle, c);
+  }
+  // Les doigtés fournis valent pour la hauteur d'origine seulement : la version transposée est doigtée par l'appli.
+  return { ...f, xml: c.xml, xmlOrigine: f.xml, transposition: t, doigtes: undefined, tonalite: '' };
 }
 
 export const tousLesMorceaux = (etat: Etat): FicheMorceau[] =>
-  [...CATALOGUE, ...Object.keys(etat.importes).map((id) => ficheMorceau(id, etat)!)];
+  [...CATALOGUE.map((f) => f.id), ...Object.keys(etat.importes)].map((id) => ficheMorceau(id, etat)!);

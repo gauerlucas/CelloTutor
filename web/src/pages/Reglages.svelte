@@ -61,6 +61,14 @@
     </select>
   </label>
   <label class="ligne">
+    <span class="etiquette">Note tenue au micro</span>
+    <select value={r.tenueMicro} onchange={(e) => stockage.regler('tenueMicro', e.currentTarget.value as 'courte' | 'normale' | 'longue')}>
+      <option value="courte">Courte (¼ s) : réagit vite</option>
+      <option value="normale">Normale (½ s)</option>
+      <option value="longue">Longue (près d’1 s) : ignore mieux les bruits</option>
+    </select>
+  </label>
+  <label class="ligne">
     <span class="etiquette">Volume</span>
     <input type="range" min="0" max="1" step="0.05" value={r.volume} onchange={(e) => stockage.regler('volume', Number(e.currentTarget.value))} />
     <span class="discret">{Math.round(r.volume * 100)} %</span>

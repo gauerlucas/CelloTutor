@@ -109,8 +109,13 @@ export interface OptionsNote {
   suite?: boolean;
 }
 
+let finSonApp = 0;
+/** Jusqu'à quand (horloge performance.now, ms) l'appli joue elle-même une note : le micro l'ignore. */
+export const sonAppJusqua = () => finSonApp;
+
 /** Joue une note de violoncelle. Renvoie l'heure audio de fin. */
 export function jouer(m: number, duree = 1.2, o: OptionsNote = {}): number {
+  finSonApp = Math.max(finSonApp, performance.now() + ((o.dans ?? 0) + duree) * 1000 + 250);
   const c = contexteAudio();
   const f = hzDeMidi(m);
   const t = c.currentTime + 0.03 + (o.dans ?? 0);
@@ -206,6 +211,7 @@ function busSuite(): GainNode {
 
 /** Arrête net toutes les notes d'une suite en cours (y compris celles déjà programmées). */
 export function couperSuite(): void {
+  finSonApp = Math.min(finSonApp, performance.now() + 150);
   if (!SUITE || !AC) return;
   const s = SUITE;
   SUITE = null;
