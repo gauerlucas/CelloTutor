@@ -1,12 +1,10 @@
 # CelloTutor
 
-Application personnelle de travail du violoncelle : positions et démanchés, lecture, gammes, oreille, morceaux-objectifs, et des séances qui s'adaptent au temps et à l'énergie du jour.
+Bricolé pour s'adapter à mes difficultés personnelles : positions et démanchés, lecture, gammes, oreille, morceaux-objectifs, et des séances qui s'adaptent au temps et à l'énergie du jour...
 
-Le cahier des charges et le plan de la V1 sont dans le dossier parent du projet (`Violoncelle/docs/`).
+## Fonctions
 
-## Ce que contient la V1
-
-- **Aujourd'hui** : choisis ton temps (15 min à 2 h), ton énergie et si tu as le violoncelle en main ; le planificateur compose une séance en blocs minutés. Une barre en haut de l'écran suit la séance sur toutes les pages (pause, report, bloc suivant), puis un bilan en un clic.
+- **Aujourd'hui** : choisir le temps (15 min à 2 h), l'énergie et si on a le violoncelle en main ; le planificateur compose une séance en blocs minutés. Une barre en haut de l'écran suit la séance sur toutes les pages (pause, report, bloc suivant), puis un bilan en un clic.
 - **Positions** : manche de la ½ à la 7ᵉ position et pouce ; nommer et trouver les notes ; démanchés jugés à l'oreille ou au micro.
 - **Morceaux** : bibliothèque et morceaux-objectifs (actif, en pause, abandonné), import MusicXML / MXL, lecteur avec partition gravée, clé au choix, son, tempo, boucle, décompte, manche synchronisé, conseils par mesure, passages et compétences à préparer, doigtés corrigeables.
 - **Lecture** : clés de fa, d'ut et de sol par étapes débloquées, suite chronométrée, notes des morceaux en cours, révisions.
