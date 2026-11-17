@@ -26,6 +26,7 @@
     oncase,
     titre = "Manche du violoncelle vu par le musicien : sillet en bas, corde de La à gauche",
     hauteur = null,
+    etiquetteCadre = false,
   }: {
     marques?: Marque[];
     cadre?: string | null;
@@ -39,6 +40,8 @@
     titre?: string;
     /** Hauteur CSS imposée (par défaut : presque toute la hauteur de l'écran). */
     hauteur?: string | null;
+    /** Accolade et nom de la position en grand, à droite du manche. */
+    etiquetteCadre?: boolean;
   } = $props();
 
   const W = 320, H = 600, SILLET = 574, HAUT = 72, MAX = 19, CX = 160, CHEVALET = 30;
@@ -63,6 +66,16 @@
     const cs = cordesDe(pos);
     const g = Math.max(...cs), d = Math.min(...cs);
     return `M${xCorde(g, yb) - 15} ${yb} L${xCorde(g, ya) - 15} ${ya} L${xCorde(d, ya) + 15} ${ya} L${xCorde(d, yb) + 15} ${yb} Z`;
+  });
+
+  const MARGE = $derived(etiquetteCadre ? 64 : 0);
+  const accolade = $derived.by(() => {
+    if (!pos || !etiquetteCadre) return null;
+    const offs = Object.values(pos.doigts) as number[];
+    const yb = yDemi(pos.ff + Math.min(...offs)) + 13, ya = yDemi(pos.ff + Math.max(...offs)) - 13;
+    const xb = xBord(1, yb) + 10, xa = xBord(1, ya) + 10;
+    const texte = pos.pouce ? 'Pouce' : pos.id === 'demi' ? '½' : pos.id === '1' ? '1re' : `${pos.id}e`;
+    return { d: `M${xb - 5} ${yb} L${xb} ${yb} L${xa} ${ya} L${xa - 5} ${ya}`, x: Math.max(xa, xb) + 7, y: (ya + yb) / 2 + 8, texte };
   });
 
   interface Point { c: number; n: number; x: number; y: number; r: number; classe: string; texte: string | null; petit: boolean }
@@ -100,7 +113,7 @@
   });
 </script>
 
-<svg class="manche" viewBox={`0 0 ${W} ${H}`} role="img" aria-label={titre} style={hauteur ? `height:${hauteur}` : undefined}>
+<svg class="manche" viewBox={`0 0 ${W + MARGE} ${H}`} role="img" aria-label={titre} style={hauteur ? `height:${hauteur}` : undefined}>
   <path class="touche" d={`M${xBord(-1, SILLET)} ${SILLET} L${xBord(-1, yHaut)} ${yHaut} L${xBord(1, yHaut)} ${yHaut} L${xBord(1, SILLET)} ${SILLET} Z`} />
   <rect class="sillet" x={xBord(-1, SILLET) - 3} y={SILLET - 2} width={xBord(1, SILLET) - xBord(-1, SILLET) + 6} height="7" rx="2" />
   <path class="caisse" d={`M${xBord(-1, yCaisse) + 2} ${yCaisse - 5} Q${CX} ${yCaisse + 9} ${xBord(1, yCaisse) - 2} ${yCaisse - 5}`} />
@@ -116,6 +129,10 @@
   {/each}
   <text class={`rep-lab ${pos?.pouce ? 'on' : ''}`} x={xBord(1, yDemi(12)) + 16} y={yDemi(12) + 4}>P</text>
   {#if forme}<path class="cadre" d={forme} />{/if}
+  {#if accolade}
+    <path class="accolade" d={accolade.d} />
+    <text class="acc-lab" x={accolade.x} y={accolade.y}>{accolade.texte}</text>
+  {/if}
   {#each CORDES as c (c.i)}
     <line class="corde" x1={xCorde(c.i, SILLET + 4)} x2={xCorde(c.i, 48)} y1={SILLET + 4} y2="48" stroke-width={EPAISSEUR[c.i]} />
     <text class="nom-corde" x={xCorde(c.i, 30)} y="13" text-anchor="middle" style={`fill:${c.couleur}`}>{c.nom}</text>
@@ -143,9 +160,11 @@
   .demi { stroke: rgba(255,255,255,.14); stroke-width: 1; }
   .harm { fill: none; stroke: #f4efe6; stroke-width: 1.2; opacity: .5; }
   .rep { stroke: var(--rule); stroke-width: 1; }
-  .rep-lab { font: 11px var(--f-mono); fill: var(--ink-soft); }
-  .rep-lab.on { fill: var(--ink); font-weight: 700; }
-  .cadre { fill: var(--accent); opacity: .22; stroke: var(--accent); stroke-width: 1.5; }
+  .rep-lab { font: 12px var(--f-mono); fill: var(--ink-soft); }
+  .rep-lab.on { fill: var(--accent); font-weight: 700; font-size: 15px; }
+  .cadre { fill: var(--accent); opacity: .3; stroke: var(--accent); stroke-width: 2; }
+  .accolade { fill: none; stroke: var(--accent); stroke-width: 3.5; stroke-linejoin: round; stroke-linecap: round; }
+  .acc-lab { font: 700 22px var(--f-body); fill: var(--accent); }
   .corde { stroke: #d9dde0; stroke-linecap: round; }
   .nom-corde { font: 700 13px var(--f-body); }
   .pt { fill: #f4efe6; opacity: .2; transition: opacity .12s, fill .12s; }

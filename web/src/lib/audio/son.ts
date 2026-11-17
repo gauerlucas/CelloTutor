@@ -1,8 +1,17 @@
 // Son de violoncelle par synthèse additive (repris de l'ébauche « Atelier ») : spectre mesuré
 // sur un enregistrement réel, vibrato retardé, souffle d'archet, cordes sympathiques, salle.
-// Des échantillons réalistes arriveront en V2 sans changer cette interface.
+// Par défaut, les notes sont jouées avec des échantillons enregistrés (echantillons.ts) ; la
+// synthèse sert de secours et reste disponible dans les réglages.
 
 import { hzDeMidi } from '../musique/notes';
+import { chargerEchantillons, echantillonsPrets, jouerEchantillon } from './echantillons';
+
+export type Timbre = 'echantillons' | 'synthese';
+let timbre: Timbre = 'echantillons';
+export function reglerTimbre(t: Timbre): void {
+  timbre = t;
+  if (t === 'echantillons' && AC) void chargerEchantillons(AC);
+}
 
 let AC: AudioContext | null = null;
 let MASTER: GainNode | null = null;
@@ -92,6 +101,7 @@ export function contexteAudio(): AudioContext {
     for (let i = 0; i < nl; i++) nd[i] = Math.random() * 2 - 1;
   }
   if (AC.state === 'suspended') void AC.resume();
+  if (timbre === 'echantillons') void chargerEchantillons(AC);
   return AC;
 }
 
@@ -122,6 +132,19 @@ export function jouer(m: number, duree = 1.2, o: OptionsNote = {}): number {
   const vel = o.force ?? 1;
   const amps = harmoniques(f);
   const fin = t + duree;
+  if (timbre === 'echantillons' && echantillonsPrets()) {
+    try {
+      const sortie = c.createGain();
+      sortie.connect(o.suite ? busSuite() : BUS!);
+      if (jouerEchantillon(c, sortie, m, t, duree, vel)) {
+        setTimeout(() => sortie.disconnect(), (fin - c.currentTime + 1) * 1000);
+        return fin;
+      }
+      sortie.disconnect();
+    } catch {
+      /* on retombe sur la synthèse */
+    }
+  }
   try {
     const sortie = c.createGain();
     sortie.connect(o.suite ? busSuite() : BUS!);

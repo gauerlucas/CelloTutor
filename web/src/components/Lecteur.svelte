@@ -13,7 +13,7 @@
   import { suggererTransposition, TRANSPOSITIONS, type Suggestion } from '../lib/morceaux/transposition';
   import { clic, couperSuite, jouer, maintenantAudio } from '../lib/audio/son';
   import { candidats } from '../lib/morceaux/doigte';
-  import { CORDES } from '../lib/musique/violoncelle';
+  import { CORDES, position } from '../lib/musique/violoncelle';
   import { deMidi, nomNote } from '../lib/musique/notes';
   import { jourDe } from '../lib/revision';
   import { seance } from '../lib/seance.svelte';
@@ -74,8 +74,16 @@
   }
   function suggerer() {
     const origine = analyser(fiche.xmlOrigine ?? fiche.xml);
-    suggestions = suggererTransposition(origine.notes).slice(0, 3);
+    const toutes = suggererTransposition(origine.notes);
+    suggestions = toutes;
+    if (toutes[0]) transposer(toutes[0].demiTons);
   }
+  const optionTransposition = (n: number) => {
+    const k = suggestions?.findIndex((sg) => sg.demiTons === n) ?? -1;
+    const libelle = libelleTransposition(n);
+    if (k < 0) return libelle;
+    return `${k < 3 ? '★ ' : ''}${libelle} · ${suggestions![k]!.aigues} %`;
+  };
   const libelleTransposition = (n: number) => TRANSPOSITIONS.find((t) => t.demiTons === n)?.libelle ?? `${n > 0 ? '+' : ''}${n} demi-tons`;
 
   // ------------------------------------------------------------- gravure
@@ -340,6 +348,7 @@
     const i = selection;
     memoriser((s) => delete correctionsEcriture(s)[i]);
   }
+  const libellePosition = (id: string) => (id.startsWith('P') ? 'Pouce' : position(id)?.label ?? id);
   const libelleDoigte = (d: Doigte | undefined) =>
     !d ? '' : d.doigt === '0' ? `corde de ${CORDES[d.corde]!.nom} à vide` : `${d.doigt === 'p' ? 'pouce' : `doigt ${d.doigt}`}, ${courtPosition(d.position)}, corde de ${CORDES[d.corde]!.nom}`;
 
@@ -398,32 +407,20 @@
         <span class="temps">{temps}</span>
       </div>
       <div class="barre">
+        <span class="discret">Clé</span>
         <div class="seg" role="group" aria-label="Clé">
-          {#each [['origine', `Clé d’origine (${partition.cleOrigine})`], ['fa', 'Fa'], ['ut', 'Ut'], ['sol', 'Sol']] as [v, t] (v)}
+          {#each [['origine', `Origine (${partition.cleOrigine})`], ['fa', 'Fa'], ['ut', 'Ut'], ['sol', 'Sol']] as [v, t] (v)}
             <button aria-pressed={cle === v} onclick={() => { cle = v as Cle | 'origine'; memoriser((s) => (s.cle = cle)); }}>{t}</button>
           {/each}
         </div>
-        <label class="case"><input type="checkbox" bind:checked={positions} /> Positions écrites aux démanchés</label>
-      </div>
-      <div class="barre">
-        <label class="transpo">
-          <span>Transposer</span>
-          <select value={transposition} onchange={(e) => transposer(Number(e.currentTarget.value))}>
-            {#each TRANSPOSITIONS as t (t.demiTons)}<option value={t.demiTons}>{t.libelle}</option>{/each}
+        <label class="case" title="Écrit la position au-dessus de la portée à chaque démanché"><input type="checkbox" bind:checked={positions} /> Positions aux démanchés</label>
+        <span class="transpo">
+          <label for="transpo-choix" title="★ : transpositions conseillées ; % : part des notes au-delà de la 4e position">Transposer</label>
+          <select id="transpo-choix" value={transposition} onchange={(e) => transposer(Number(e.currentTarget.value))}>
+            {#each TRANSPOSITIONS as t (t.demiTons)}<option value={t.demiTons}>{optionTransposition(t.demiTons)}</option>{/each}
           </select>
-        </label>
-        <button class="btn discret-btn" onclick={suggerer}>Suggérer, au plus près de la 1re position</button>
-        {#if suggestions}
-          <span class="suggestions">
-            {#each suggestions as sg (sg.demiTons)}
-              <button class="btn discret-btn" aria-pressed={transposition === sg.demiTons} onclick={() => transposer(sg.demiTons)}
-                title={`Position la plus haute : ${sg.plusHaute}`}>
-                {libelleTransposition(sg.demiTons)} · {sg.aigues} % au-delà de la 4e
-              </button>
-            {/each}
-          </span>
-        {/if}
-        <span class="discret aide">Touche une note pour l’entendre et voir son doigté. Espace : lecture / arrêt ; ← → : note par note.</span>
+          <button class="btn discret-btn" onclick={suggerer} title="Choisit la transposition qui garde le morceau le plus près de la 1re position ; les meilleures sont marquées ★ dans la liste">★ Suggérer</button>
+        </span>
       </div>
 
       <div class="partition" bind:clientWidth={largeur} bind:this={zone} onclick={surClicPartition} role="presentation">
@@ -437,18 +434,25 @@
 
     <aside class="droite">
       <div class="haut-droite">
-        <Manche {marques} {cadre} doigts={false} hauteur="min(46vh, 430px)" titre="Manche synchronisé avec la note jouée" />
+        <Manche {marques} {cadre} etiquetteCadre doigts={false} hauteur="min(46vh, 430px)" titre="Manche synchronisé avec la note jouée" />
         <div class="note-info">
           {#if focus != null}
             {@const n = partition.notes[focus]!}
             <p class="grosse">{nomNote(n, style, true)}</p>
+            {#if cadre}
+              {@const suivante = focus + 1 < partition.notes.length ? doigtes[focus + 1]?.position : null}
+              <p class="badge-pos">{libellePosition(cadre)}</p>
+              {#if suivante && suivante !== cadre}<p class="demanche">Démanché ensuite → {libellePosition(suivante)}</p>{/if}
+            {:else if doigtes[focus]?.doigt === '0'}
+              <p class="badge-pos vide">Corde à vide</p>
+            {/if}
             <p>{libelleDoigte(doigtes[focus])}</p>
             <p class="discret">Mesure {n.mesure}</p>
             {#if focus + 1 < partition.notes.length}
               <p class="discret">Ensuite <span class="pastille-orange"></span> {nomNote(partition.notes[focus + 1]!, style)} : {libelleDoigte(doigtes[focus + 1])}</p>
             {/if}
           {:else}
-            <p class="discret">Choisis une note ou un passage : le manche montre le doigt à poser (bleu) et le suivant (orange).</p>
+            <p class="discret">Touche une note ou choisis un passage : le manche montre le doigt à poser (bleu), le suivant (orange) et la position. Espace : lecture / arrêt ; ← → : note par note.</p>
           {/if}
         </div>
       </div>
@@ -531,19 +535,18 @@
   .entete h1 { margin: 0; font-size: 1.6rem; }
   .entete p { margin: .2rem 0 .6rem; }
   .barre { display: flex; flex-wrap: wrap; align-items: center; gap: .5rem 1rem; margin-bottom: .6rem; }
-  .jouer { min-width: 13rem; }
+  .jouer { min-width: 11rem; }
   .tempo { display: flex; flex-direction: column; font-size: .85rem; min-width: 12rem; }
   .tempo input { accent-color: var(--accent); }
   .case { display: inline-flex; gap: .35rem; align-items: center; cursor: pointer; }
   .case input { width: 17px; height: 17px; accent-color: var(--accent); }
   .temps { font: .9rem var(--f-mono); color: var(--ink-soft); }
   .aide { font-size: .85rem; }
-  .transpo { display: inline-flex; align-items: center; gap: .5rem; }
+  .transpo { display: inline-flex; align-items: center; gap: .4rem; }
+  .transpo select { max-width: 15.5rem; }
   .transpo select { font: inherit; padding: .3em .5em; border-radius: 6px; border: 1px solid var(--rule); background: var(--surface); color: var(--ink); }
-  .suggestions { display: inline-flex; flex-wrap: wrap; gap: .4rem; }
-  .suggestions .btn[aria-pressed='true'] { border-color: var(--accent); background: var(--accent-soft); }
   .partition { position: relative; background: #fbf8f1; border: 1px solid var(--rule); border-radius: 10px; padding: .4rem;
-    height: calc(100vh - 16rem); min-height: 380px; overflow-y: scroll; color: #1d1a16; }
+    height: calc(100vh - 12rem); min-height: 380px; overflow-y: scroll; color: #1d1a16; }
   .partition :global(svg) { display: block; width: 100%; height: auto; }
   .partition :global(g.note) { cursor: pointer; }
   .partition :global(g.note:hover) { fill: #6b5a3c; color: #6b5a3c; }
@@ -556,6 +559,9 @@
   .note-info { flex: 1; min-width: 0; font-size: .92rem; }
   .note-info p { margin: 0 0 .35rem; }
   .grosse { font-family: var(--f-display); font-size: 1.7rem; font-weight: 700; }
+  .badge-pos { display: inline-block; white-space: nowrap; font: 700 1.05rem var(--f-body); color: #fff; background: var(--accent); padding: .25em .6em; border-radius: 8px; margin: .1rem 0 .5rem !important; }
+  .badge-pos.vide { background: var(--ink-soft); }
+  .demanche { font-weight: 700; color: var(--s-la); }
   .pastille-orange { display: inline-block; width: .7em; height: .7em; border-radius: 50%; background: var(--s-la); vertical-align: middle; }
   .conseil p { margin: .2rem 0; }
   .passages { display: flex; flex-wrap: wrap; gap: 5px; margin: .4rem 0; }
