@@ -4,20 +4,20 @@
   "fichier": "36.mp3",
   "boucle": [
    1.44,
-   2.9587
+   2.9437
   ],
-  "gain": 0.679,
+  "gain": 0.878,
   "source": "195272__flcellogrl__1_cello_c2.wav",
-  "cents": -8
+  "cents": -7
  },
  {
   "midi": 37,
   "fichier": "37.mp3",
   "boucle": [
    1.44,
-   2.9308
+   2.9456
   ],
-  "gain": 0.446,
+  "gain": 0.491,
   "source": "195278__flcellogrl__2_cello_c2_db2.wav",
   "cents": -22
  },
@@ -28,7 +28,7 @@
    1.44,
    2.9582
   ],
-  "gain": 1.107,
+  "gain": 1.909,
   "source": "195277__flcellogrl__3_cello_d2.wav",
   "cents": -11
  },
@@ -37,108 +37,108 @@
   "fichier": "39.mp3",
   "boucle": [
    1.44,
-   2.9355
+   2.9358
   ],
-  "gain": 1.11,
+  "gain": 1.216,
   "source": "195276__flcellogrl__4_cello_d2_eb2.wav",
-  "cents": -34
+  "cents": -35
  },
  {
   "midi": 40,
   "fichier": "40.mp3",
   "boucle": [
-   1.44,
-   2.9394
+   1.431,
+   2.9307
   ],
-  "gain": 0.592,
+  "gain": 0.696,
   "source": "195281__flcellogrl__5_cello_e2.wav",
-  "cents": -44
+  "cents": -48
  },
  {
   "midi": 41,
   "fichier": "41.mp3",
   "boucle": [
    1.44,
-   2.9483
+   2.9361
   ],
-  "gain": 1.545,
+  "gain": 1.731,
   "source": "195280__flcellogrl__6_cello_f2.wav",
-  "cents": -28
+  "cents": -40
  },
  {
   "midi": 42,
   "fichier": "42.mp3",
   "boucle": [
    1.44,
-   2.9324
+   2.9439
   ],
-  "gain": 0.365,
+  "gain": 0.396,
   "source": "195283__flcellogrl__7_cello_f2_gb2.wav",
-  "cents": -39
+  "cents": -40
  },
  {
   "midi": 43,
   "fichier": "43.mp3",
   "boucle": [
-   1.44,
-   2.9447
+   1.4175,
+   2.8993
   ],
-  "gain": 0.267,
-  "source": "195282__flcellogrl__8_cello_g2_fingeroncstring.wav",
-  "cents": 2
+  "gain": 0.411,
+  "source": "195284__flcellogrl__8_cello_g2_openstring.wav",
+  "cents": -6
  },
  {
   "midi": 44,
   "fichier": "44.mp3",
   "boucle": [
    1.44,
-   2.9498
+   2.9415
   ],
-  "gain": 0.576,
+  "gain": 0.71,
   "source": "195285__flcellogrl__9_cello_g2_ab2.wav",
-  "cents": 0
+  "cents": -2
  },
  {
   "midi": 45,
   "fichier": "45.mp3",
   "boucle": [
    1.44,
-   2.9325
+   2.9421
   ],
-  "gain": 0.521,
+  "gain": 0.626,
   "source": "195275__flcellogrl__10_cello_a2.wav",
-  "cents": -12
+  "cents": -5
  },
  {
   "midi": 46,
   "fichier": "46.mp3",
   "boucle": [
    1.44,
-   2.9502
+   2.9499
   ],
-  "gain": 0.932,
+  "gain": 1.07,
   "source": "195274__flcellogrl__11_cello_a2_bb2.wav",
-  "cents": -5
+  "cents": -13
  },
  {
   "midi": 47,
   "fichier": "47.mp3",
   "boucle": [
    1.44,
-   2.9477
+   2.9473
   ],
-  "gain": 0.615,
+  "gain": 0.645,
   "source": "195273__flcellogrl__12_cello_b2.wav",
-  "cents": 29
+  "cents": 30
  },
  {
   "midi": 48,
   "fichier": "48.mp3",
   "boucle": [
-   1.341,
-   2.7351
+   1.314,
+   2.6852
   ],
-  "gain": 0.679,
+  "gain": 0.735,
   "source": "195279__flcellogrl__1_cello_c3.wav",
   "cents": 11
  },
@@ -146,87 +146,87 @@
   "midi": 49,
   "fichier": "49.mp3",
   "boucle": [
-   1.4355,
-   2.9365
+   1.35,
+   2.7569
   ],
   "gain": 4.0,
   "source": "195543__flcellogrl__2_cello_c3_db3.wav",
-  "cents": -11
+  "cents": -5
  },
  {
   "midi": 50,
   "fichier": "50.mp3",
   "boucle": [
-   1.44,
-   2.9524
+   1.4355,
+   2.9366
   ],
-  "gain": 2.729,
+  "gain": 2.881,
   "source": "195549__flcellogrl__3_cello_d3_openstring.wav",
-  "cents": -1
+  "cents": -2
  },
  {
   "midi": 51,
   "fichier": "51.mp3",
   "boucle": [
-   1.206,
-   2.4673
+   1.008,
+   2.0626
   ],
-  "gain": 2.121,
+  "gain": 2.19,
   "source": "195548__flcellogrl__4_cello_d3_eb3.wav",
-  "cents": -4
+  "cents": -12
  },
  {
   "midi": 52,
   "fichier": "52.mp3",
   "boucle": [
-   1.3005,
-   2.6524
+   1.161,
+   2.3661
   ],
-  "gain": 1.341,
+  "gain": 1.354,
   "source": "195547__flcellogrl__5_cello_e3.wav",
-  "cents": -4
+  "cents": -12
  },
  {
   "midi": 53,
   "fichier": "53.mp3",
   "boucle": [
-   1.296,
-   2.6435
+   1.116,
+   2.2754
   ],
-  "gain": 2.071,
+  "gain": 2.373,
   "source": "195546__flcellogrl__6_cello_f3.wav",
-  "cents": 0
+  "cents": 6
  },
  {
   "midi": 54,
   "fichier": "54.mp3",
   "boucle": [
-   1.1655,
-   2.3879
+   1.035,
+   2.11
   ],
-  "gain": 1.417,
+  "gain": 1.816,
   "source": "195551__flcellogrl__7_cello_f3_gb3.wav",
-  "cents": -11
+  "cents": -15
  },
  {
   "midi": 56,
   "fichier": "56.mp3",
   "boucle": [
-   1.0125,
-   2.0762
+   0.7965,
+   1.6286
   ],
-  "gain": 0.615,
+  "gain": 0.63,
   "source": "195552__flcellogrl__9_cello_g3_ab3.wav",
-  "cents": -41
+  "cents": -38
  },
  {
   "midi": 57,
   "fichier": "57.mp3",
   "boucle": [
    1.44,
-   2.9377
+   2.9422
   ],
-  "gain": 0.57,
+  "gain": 1.982,
   "source": "195689__flcellogrl__10_cello_a3_openstring.wav",
   "cents": -2
  },
@@ -234,54 +234,54 @@
   "midi": 58,
   "fichier": "58.mp3",
   "boucle": [
-   1.179,
-   2.4067
+   1.0035,
+   2.0503
   ],
-  "gain": 1.442,
+  "gain": 1.774,
   "source": "195544__flcellogrl__11_cello_a3_bb3.wav",
-  "cents": -7
+  "cents": -5
  },
  {
   "midi": 59,
   "fichier": "59.mp3",
   "boucle": [
    1.44,
-   2.9485
+   2.9442
   ],
-  "gain": 0.818,
+  "gain": 1.378,
   "source": "195688__flcellogrl__12_cello_b3.wav",
-  "cents": -13
+  "cents": -11
  },
  {
   "midi": 60,
   "fichier": "60.mp3",
   "boucle": [
-   1.1745,
-   2.4031
+   1.0035,
+   2.0485
   ],
-  "gain": 0.666,
+  "gain": 0.717,
   "source": "195690__flcellogrl__1_cello_c4.wav",
-  "cents": 4
+  "cents": -1
  },
  {
   "midi": 61,
   "fichier": "61.mp3",
   "boucle": [
-   1.197,
-   2.4433
+   1.0575,
+   2.1585
   ],
-  "gain": 0.712,
+  "gain": 0.75,
   "source": "195696__flcellogrl__2_cello_c4_db4.wav",
-  "cents": -6
+  "cents": -11
  },
  {
   "midi": 62,
   "fichier": "62.mp3",
   "boucle": [
-   1.17,
-   2.3912
+   1.008,
+   2.0597
   ],
-  "gain": 0.962,
+  "gain": 1.114,
   "source": "195695__flcellogrl__3_cello_d4.wav",
   "cents": 11
  },
@@ -289,99 +289,99 @@
   "midi": 63,
   "fichier": "63.mp3",
   "boucle": [
-   1.341,
-   2.7416
+   1.1295,
+   2.3092
   ],
-  "gain": 1.234,
+  "gain": 1.539,
   "source": "195694__flcellogrl__4_cello_d4_eb4.wav",
-  "cents": 9
+  "cents": 4
  },
  {
   "midi": 64,
   "fichier": "64.mp3",
   "boucle": [
-   1.233,
-   2.5231
+   1.026,
+   2.0994
   ],
-  "gain": 0.896,
+  "gain": 1.245,
   "source": "195699__flcellogrl__5_cello_e4.wav",
-  "cents": -23
+  "cents": -13
  },
  {
   "midi": 65,
   "fichier": "65.mp3",
   "boucle": [
-   1.2915,
-   2.6426
+   1.0845,
+   2.2139
   ],
-  "gain": 0.627,
+  "gain": 0.701,
   "source": "195698__flcellogrl__6_cello_f4.wav",
-  "cents": -6
+  "cents": -1
  },
  {
   "midi": 66,
   "fichier": "66.mp3",
   "boucle": [
-   1.1385,
-   2.3254
+   0.8955,
+   1.8283
   ],
-  "gain": 0.71,
+  "gain": 0.837,
   "source": "195701__flcellogrl__7_cello_f4_gb4.wav",
-  "cents": -10
+  "cents": -5
  },
  {
   "midi": 67,
   "fichier": "67.mp3",
   "boucle": [
-   1.1655,
-   2.3836
+   1.0395,
+   2.1277
   ],
-  "gain": 1.233,
+  "gain": 1.449,
   "source": "195700__flcellogrl__8_cello_g4.wav",
-  "cents": -2
+  "cents": 1
  },
  {
   "midi": 68,
   "fichier": "68.mp3",
   "boucle": [
-   1.107,
-   2.2606
+   0.927,
+   1.8957
   ],
-  "gain": 0.802,
+  "gain": 0.878,
   "source": "195702__flcellogrl__9_cello_g4_ab4.wav",
-  "cents": -28
+  "cents": -22
  },
  {
   "midi": 69,
   "fichier": "69.mp3",
   "boucle": [
-   1.3635,
-   2.7881
+   1.2555,
+   2.5669
   ],
-  "gain": 1.035,
+  "gain": 1.131,
   "source": "195693__flcellogrl__10_cello_a4.wav",
-  "cents": 12
+  "cents": 5
  },
  {
   "midi": 70,
   "fichier": "70.mp3",
   "boucle": [
-   1.278,
-   2.612
+   1.26,
+   2.5744
   ],
-  "gain": 1.405,
+  "gain": 1.919,
   "source": "195692__flcellogrl__11_cello_a4_bb4.wav",
-  "cents": -12
+  "cents": -13
  },
  {
   "midi": 71,
   "fichier": "71.mp3",
   "boucle": [
-   1.152,
-   2.3555
+   1.134,
+   2.3174
   ],
-  "gain": 0.757,
+  "gain": 0.891,
   "source": "195691__flcellogrl__12_cello_b4.wav",
-  "cents": 0
+  "cents": 4
  }
 ]

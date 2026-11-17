@@ -81,6 +81,35 @@ def enveloppe(x: np.ndarray, pas: int = 441) -> np.ndarray:
     return np.sqrt(np.mean(x[: n * pas].reshape(n, pas) ** 2, axis=1))
 
 
+def lisser(v: np.ndarray, n: int) -> np.ndarray:
+    return np.convolve(v, np.ones(n) / n, mode='same') if n > 1 else v
+
+
+def attaque_nette(x: np.ndarray, garde: float = 0.06, plafond: float = 1.12) -> np.ndarray:
+    """Raccourcit une attaque d'archet trop lente et adoucit une attaque trop « mordue ».
+
+    Les enregistrements mettent jusqu'à 0,6 s à atteindre leur plein son : une note brève
+    n'en jouait que le début, presque inaudible. On commence `garde` secondes avant que le son
+    n'atteigne 80 % de la tenue (avec un fondu de 12 ms), puis on rabote les pointes au-dessus
+    de `plafond` × la tenue, sans toucher à la tenue elle-même.
+    """
+    env = enveloppe(x)
+    n = len(env)
+    tenue = float(np.median(env[int(0.4 * n):int(0.9 * n)])) if n > 20 else float(env.max())
+    if tenue <= 0:
+        return x
+    i80 = int(np.argmax(env >= 0.8 * tenue))
+    debut = max(0, int((i80 * 0.01 - garde) * SR))
+    y = x[debut:].copy()
+    f = int(0.012 * SR)
+    y[:f] *= np.linspace(0, 1, f)
+    # limiteur doux sur l'enveloppe (fenêtre 20 ms, gain lissé sur 40 ms)
+    e = np.sqrt(lisser(y * y, int(0.02 * SR)))
+    g = np.minimum(1.0, plafond * tenue / np.maximum(e, 1e-9))
+    g = lisser(g, int(0.04 * SR))
+    return y * g
+
+
 def preparer(x: np.ndarray, duree_max: float):
     env = enveloppe(x)
     pic = env.max()
@@ -89,6 +118,7 @@ def preparer(x: np.ndarray, duree_max: float):
     # début : premier dépassement de -40 dB sous le pic, avec 10 ms de marge
     i0 = max(0, int(np.argmax(env > pic * 0.01)) * 441 - 441)
     x = x[i0:]
+    x = attaque_nette(x)
     env = enveloppe(x)
     # fin utile : dernier point au-dessus de -20 dB
     au_dessus = np.nonzero(env > pic * 0.1)[0]
