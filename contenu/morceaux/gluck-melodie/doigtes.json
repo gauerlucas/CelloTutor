@@ -1,0 +1,1747 @@
+{
+ "doigtes": [
+  {
+   "mesure": 1,
+   "corde": 3,
+   "position": "4e",
+   "doigt": 2,
+   "demiTons": 8
+  },
+  {
+   "mesure": 1,
+   "corde": 3,
+   "position": "4e",
+   "doigt": 1,
+   "demiTons": 7
+  },
+  {
+   "mesure": 1,
+   "corde": 3,
+   "position": "4e",
+   "doigt": 2,
+   "demiTons": 8
+  },
+  {
+   "mesure": 1,
+   "corde": 3,
+   "position": "4e",
+   "doigt": 4,
+   "demiTons": 10
+  },
+  {
+   "mesure": 1,
+   "corde": 3,
+   "position": "4e",
+   "doigt": 2,
+   "demiTons": 8
+  },
+  {
+   "mesure": 1,
+   "corde": 3,
+   "position": "4e",
+   "doigt": 1,
+   "demiTons": 7
+  },
+  {
+   "mesure": 1,
+   "corde": 2,
+   "position": "6e",
+   "doigt": 3,
+   "demiTons": 12
+  },
+  {
+   "mesure": 2,
+   "corde": 2,
+   "position": "6e",
+   "doigt": 3,
+   "demiTons": 12
+  },
+  {
+   "mesure": 2,
+   "corde": 2,
+   "position": "6e",
+   "doigt": 2,
+   "demiTons": 11
+  },
+  {
+   "mesure": 3,
+   "corde": 3,
+   "position": "6e",
+   "doigt": 3,
+   "demiTons": 12
+  },
+  {
+   "mesure": 3,
+   "corde": 3,
+   "position": "6e",
+   "doigt": 4,
+   "demiTons": 13
+  },
+  {
+   "mesure": 3,
+   "corde": 3,
+   "position": "6e",
+   "doigt": 3,
+   "demiTons": 12
+  },
+  {
+   "mesure": 4,
+   "corde": 3,
+   "position": "6e",
+   "doigt": 4,
+   "demiTons": 13
+  },
+  {
+   "mesure": 4,
+   "corde": 3,
+   "position": "6e",
+   "doigt": 3,
+   "demiTons": 12
+  },
+  {
+   "mesure": 4,
+   "corde": 3,
+   "position": "P14",
+   "doigt": 1,
+   "demiTons": 16
+  },
+  {
+   "mesure": 4,
+   "corde": 3,
+   "position": "P14",
+   "doigt": 2,
+   "demiTons": 17
+  },
+  {
+   "mesure": 4,
+   "corde": 3,
+   "position": "P14",
+   "doigt": 3,
+   "demiTons": 19
+  },
+  {
+   "mesure": 5,
+   "corde": 3,
+   "position": "P14",
+   "doigt": 2,
+   "demiTons": 17
+  },
+  {
+   "mesure": 5,
+   "corde": 3,
+   "position": "P14",
+   "doigt": 1,
+   "demiTons": 16
+  },
+  {
+   "mesure": 5,
+   "corde": 3,
+   "position": "P14",
+   "doigt": 2,
+   "demiTons": 17
+  },
+  {
+   "mesure": 5,
+   "corde": 3,
+   "position": "6e",
+   "doigt": 2,
+   "demiTons": 11
+  },
+  {
+   "mesure": 6,
+   "corde": 3,
+   "position": "6e",
+   "doigt": 2,
+   "demiTons": 11
+  },
+  {
+   "mesure": 6,
+   "corde": 3,
+   "position": "6e",
+   "doigt": 3,
+   "demiTons": 12
+  },
+  {
+   "mesure": 6,
+   "corde": 3,
+   "position": "P14",
+   "doigt": 1,
+   "demiTons": 16
+  },
+  {
+   "mesure": 6,
+   "corde": 3,
+   "position": "P14",
+   "doigt": 2,
+   "demiTons": 17
+  },
+  {
+   "mesure": 6,
+   "corde": 3,
+   "position": "P14",
+   "doigt": 3,
+   "demiTons": 19
+  },
+  {
+   "mesure": 7,
+   "corde": 3,
+   "position": "P14",
+   "doigt": 2,
+   "demiTons": 17
+  },
+  {
+   "mesure": 7,
+   "corde": 3,
+   "position": "P14",
+   "doigt": 1,
+   "demiTons": 16
+  },
+  {
+   "mesure": 7,
+   "corde": 3,
+   "position": "P14",
+   "doigt": 2,
+   "demiTons": 17
+  },
+  {
+   "mesure": 7,
+   "corde": 3,
+   "position": "P14",
+   "doigt": 1,
+   "demiTons": 16
+  },
+  {
+   "mesure": 7,
+   "corde": 3,
+   "position": "P14",
+   "doigt": 2,
+   "demiTons": 17
+  },
+  {
+   "mesure": 7,
+   "corde": 3,
+   "position": "6e",
+   "doigt": 2,
+   "demiTons": 11
+  },
+  {
+   "mesure": 8,
+   "corde": 3,
+   "position": "6e",
+   "doigt": 3,
+   "demiTons": 12
+  },
+  {
+   "mesure": 8,
+   "corde": 2,
+   "position": "4e",
+   "doigt": 1,
+   "demiTons": 7
+  },
+  {
+   "mesure": 8,
+   "corde": 2,
+   "position": "4e",
+   "doigt": 3,
+   "demiTons": 9
+  },
+  {
+   "mesure": 8,
+   "corde": 3,
+   "position": "2e",
+   "doigt": 2,
+   "demiTons": 4
+  },
+  {
+   "mesure": 8,
+   "corde": 3,
+   "position": "2e",
+   "doigt": 3,
+   "demiTons": 5
+  },
+  {
+   "mesure": 8,
+   "corde": 3,
+   "position": "4e",
+   "doigt": 1,
+   "demiTons": 7
+  },
+  {
+   "mesure": 8,
+   "corde": 3,
+   "position": "4e",
+   "doigt": 2,
+   "demiTons": 8
+  },
+  {
+   "mesure": 8,
+   "corde": 3,
+   "position": "4e",
+   "doigt": 4,
+   "demiTons": 10
+  },
+  {
+   "mesure": 8,
+   "corde": 3,
+   "position": "6e",
+   "doigt": 3,
+   "demiTons": 12
+  },
+  {
+   "mesure": 8,
+   "corde": 3,
+   "position": "6e",
+   "doigt": 4,
+   "demiTons": 13
+  },
+  {
+   "mesure": 8,
+   "corde": 3,
+   "position": "P14",
+   "doigt": 1,
+   "demiTons": 16
+  },
+  {
+   "mesure": 8,
+   "corde": 3,
+   "position": "P14",
+   "doigt": 2,
+   "demiTons": 17
+  },
+  {
+   "mesure": 8,
+   "corde": 3,
+   "position": "P14",
+   "doigt": 3,
+   "demiTons": 19
+  },
+  {
+   "mesure": 9,
+   "corde": 3,
+   "position": "P15",
+   "doigt": 3,
+   "demiTons": 20
+  },
+  {
+   "mesure": 9,
+   "corde": 3,
+   "position": "P15",
+   "doigt": 2,
+   "demiTons": 19
+  },
+  {
+   "mesure": 9,
+   "corde": 3,
+   "position": "P15",
+   "doigt": 1,
+   "demiTons": 17
+  },
+  {
+   "mesure": 9,
+   "corde": 3,
+   "position": "7e",
+   "doigt": 4,
+   "demiTons": 15
+  },
+  {
+   "mesure": 9,
+   "corde": 3,
+   "position": "7e",
+   "doigt": 2,
+   "demiTons": 13
+  },
+  {
+   "mesure": 10,
+   "corde": 3,
+   "position": "7e",
+   "doigt": 2,
+   "demiTons": 13
+  },
+  {
+   "mesure": 10,
+   "corde": 3,
+   "position": "7e",
+   "doigt": 1,
+   "demiTons": 12
+  },
+  {
+   "mesure": 11,
+   "corde": 3,
+   "position": "7e",
+   "doigt": 3,
+   "demiTons": 14
+  },
+  {
+   "mesure": 11,
+   "corde": 3,
+   "position": "7e",
+   "doigt": 4,
+   "demiTons": 15
+  },
+  {
+   "mesure": 11,
+   "corde": 3,
+   "position": "P12",
+   "doigt": 2,
+   "demiTons": 16
+  },
+  {
+   "mesure": 11,
+   "corde": 3,
+   "position": "P12",
+   "doigt": 3,
+   "demiTons": 17
+  },
+  {
+   "mesure": 11,
+   "corde": 3,
+   "position": "6e",
+   "doigt": 4,
+   "demiTons": 13
+  },
+  {
+   "mesure": 11,
+   "corde": 3,
+   "position": "6e",
+   "doigt": 3,
+   "demiTons": 12
+  },
+  {
+   "mesure": 11,
+   "corde": 3,
+   "position": "6e",
+   "doigt": 1,
+   "demiTons": 10
+  },
+  {
+   "mesure": 11,
+   "corde": 2,
+   "position": "7e",
+   "doigt": 4,
+   "demiTons": 15
+  },
+  {
+   "mesure": 12,
+   "corde": 2,
+   "position": "7e",
+   "doigt": 4,
+   "demiTons": 15
+  },
+  {
+   "mesure": 12,
+   "corde": 2,
+   "position": "7e",
+   "doigt": 3,
+   "demiTons": 14
+  },
+  {
+   "mesure": 12,
+   "corde": 3,
+   "position": "7e",
+   "doigt": 1,
+   "demiTons": 12
+  },
+  {
+   "mesure": 12,
+   "corde": 3,
+   "position": "7e",
+   "doigt": 2,
+   "demiTons": 13
+  },
+  {
+   "mesure": 12,
+   "corde": 3,
+   "position": "7e",
+   "doigt": 1,
+   "demiTons": 12
+  },
+  {
+   "mesure": 12,
+   "corde": 3,
+   "position": "7e",
+   "doigt": 2,
+   "demiTons": 13
+  },
+  {
+   "mesure": 12,
+   "corde": 3,
+   "position": "7e",
+   "doigt": 4,
+   "demiTons": 15
+  },
+  {
+   "mesure": 12,
+   "corde": 3,
+   "position": "7e",
+   "doigt": 4,
+   "demiTons": 15
+  },
+  {
+   "mesure": 13,
+   "corde": 3,
+   "position": "7e",
+   "doigt": 4,
+   "demiTons": 15
+  },
+  {
+   "mesure": 13,
+   "corde": 2,
+   "position": "7e",
+   "doigt": 1,
+   "demiTons": 12
+  },
+  {
+   "mesure": 13,
+   "corde": 3,
+   "position": "7e",
+   "doigt": 1,
+   "demiTons": 12
+  },
+  {
+   "mesure": 13,
+   "corde": 3,
+   "position": "7e",
+   "doigt": 2,
+   "demiTons": 13
+  },
+  {
+   "mesure": 13,
+   "corde": 3,
+   "position": "7e",
+   "doigt": 1,
+   "demiTons": 12
+  },
+  {
+   "mesure": 13,
+   "corde": 3,
+   "position": "7e",
+   "doigt": 2,
+   "demiTons": 13
+  },
+  {
+   "mesure": 13,
+   "corde": 3,
+   "position": "7e",
+   "doigt": 4,
+   "demiTons": 15
+  },
+  {
+   "mesure": 13,
+   "corde": 3,
+   "position": "7e",
+   "doigt": 4,
+   "demiTons": 15
+  },
+  {
+   "mesure": 14,
+   "corde": 3,
+   "position": "7e",
+   "doigt": 4,
+   "demiTons": 15
+  },
+  {
+   "mesure": 14,
+   "corde": 2,
+   "position": "7e",
+   "doigt": 4,
+   "demiTons": 15
+  },
+  {
+   "mesure": 14,
+   "corde": 3,
+   "position": "6e",
+   "doigt": 1,
+   "demiTons": 10
+  },
+  {
+   "mesure": 14,
+   "corde": 3,
+   "position": "6e",
+   "doigt": 3,
+   "demiTons": 12
+  },
+  {
+   "mesure": 14,
+   "corde": 3,
+   "position": "6e",
+   "doigt": 4,
+   "demiTons": 13
+  },
+  {
+   "mesure": 14,
+   "corde": 3,
+   "position": "6e",
+   "doigt": 3,
+   "demiTons": 12
+  },
+  {
+   "mesure": 15,
+   "corde": 3,
+   "position": "4e",
+   "doigt": 4,
+   "demiTons": 10
+  },
+  {
+   "mesure": 15,
+   "corde": 3,
+   "position": "4e",
+   "doigt": 2,
+   "demiTons": 8
+  },
+  {
+   "mesure": 15,
+   "corde": 3,
+   "position": "4e",
+   "doigt": 1,
+   "demiTons": 7
+  },
+  {
+   "mesure": 16,
+   "corde": 3,
+   "position": "4e",
+   "doigt": 2,
+   "demiTons": 8
+  },
+  {
+   "mesure": 17,
+   "corde": 3,
+   "position": "4e",
+   "doigt": 3,
+   "demiTons": 9
+  },
+  {
+   "mesure": 17,
+   "corde": 3,
+   "position": "P14",
+   "doigt": 2,
+   "demiTons": 18
+  },
+  {
+   "mesure": 17,
+   "corde": 3,
+   "position": "P14",
+   "doigt": 2,
+   "demiTons": 17
+  },
+  {
+   "mesure": 17,
+   "corde": 2,
+   "position": "P14",
+   "doigt": 1,
+   "demiTons": 16
+  },
+  {
+   "mesure": 18,
+   "corde": 2,
+   "position": "P14",
+   "doigt": 2,
+   "demiTons": 17
+  },
+  {
+   "mesure": 19,
+   "corde": 2,
+   "position": "P14",
+   "doigt": 2,
+   "demiTons": 18
+  },
+  {
+   "mesure": 19,
+   "corde": 3,
+   "position": "P15",
+   "doigt": 3,
+   "demiTons": 20
+  },
+  {
+   "mesure": 19,
+   "corde": 3,
+   "position": "P15",
+   "doigt": 2,
+   "demiTons": 19
+  },
+  {
+   "mesure": 19,
+   "corde": 3,
+   "position": "6e",
+   "doigt": 2,
+   "demiTons": 11
+  },
+  {
+   "mesure": 20,
+   "corde": 3,
+   "position": "6e",
+   "doigt": 2,
+   "demiTons": 11
+  },
+  {
+   "mesure": 20,
+   "corde": 3,
+   "position": "6e",
+   "doigt": 3,
+   "demiTons": 12
+  },
+  {
+   "mesure": 20,
+   "corde": 3,
+   "position": "4e",
+   "doigt": 2,
+   "demiTons": 8
+  },
+  {
+   "mesure": 20,
+   "corde": 3,
+   "position": "4e",
+   "doigt": 4,
+   "demiTons": 10
+  },
+  {
+   "mesure": 20,
+   "corde": 3,
+   "position": "4e",
+   "doigt": 2,
+   "demiTons": 8
+  },
+  {
+   "mesure": 20,
+   "corde": 3,
+   "position": "4e",
+   "doigt": 4,
+   "demiTons": 10
+  },
+  {
+   "mesure": 20,
+   "corde": 3,
+   "position": "6e",
+   "doigt": 3,
+   "demiTons": 12
+  },
+  {
+   "mesure": 20,
+   "corde": 3,
+   "position": "6e",
+   "doigt": 3,
+   "demiTons": 12
+  },
+  {
+   "mesure": 21,
+   "corde": 3,
+   "position": "6e",
+   "doigt": 3,
+   "demiTons": 12
+  },
+  {
+   "mesure": 21,
+   "corde": 2,
+   "position": "4e",
+   "doigt": 2,
+   "demiTons": 8
+  },
+  {
+   "mesure": 21,
+   "corde": 3,
+   "position": "4e",
+   "doigt": 2,
+   "demiTons": 8
+  },
+  {
+   "mesure": 21,
+   "corde": 3,
+   "position": "4e",
+   "doigt": 4,
+   "demiTons": 10
+  },
+  {
+   "mesure": 21,
+   "corde": 3,
+   "position": "4e",
+   "doigt": 2,
+   "demiTons": 8
+  },
+  {
+   "mesure": 21,
+   "corde": 3,
+   "position": "4e",
+   "doigt": 4,
+   "demiTons": 10
+  },
+  {
+   "mesure": 21,
+   "corde": 3,
+   "position": "6e",
+   "doigt": 3,
+   "demiTons": 12
+  },
+  {
+   "mesure": 21,
+   "corde": 3,
+   "position": "6e",
+   "doigt": 3,
+   "demiTons": 12
+  },
+  {
+   "mesure": 22,
+   "corde": 3,
+   "position": "6e",
+   "doigt": 3,
+   "demiTons": 12
+  },
+  {
+   "mesure": 22,
+   "corde": 2,
+   "position": "6e",
+   "doigt": 3,
+   "demiTons": 12
+  },
+  {
+   "mesure": 22,
+   "corde": 3,
+   "position": "4e",
+   "doigt": 2,
+   "demiTons": 8
+  },
+  {
+   "mesure": 22,
+   "corde": 3,
+   "position": "4e",
+   "doigt": 4,
+   "demiTons": 10
+  },
+  {
+   "mesure": 22,
+   "corde": 3,
+   "position": "4e",
+   "doigt": 2,
+   "demiTons": 8
+  },
+  {
+   "mesure": 22,
+   "corde": 3,
+   "position": "4e",
+   "doigt": 4,
+   "demiTons": 10
+  },
+  {
+   "mesure": 22,
+   "corde": 3,
+   "position": "6e",
+   "doigt": 3,
+   "demiTons": 12
+  },
+  {
+   "mesure": 22,
+   "corde": 3,
+   "position": "6e",
+   "doigt": 3,
+   "demiTons": 12
+  },
+  {
+   "mesure": 23,
+   "corde": 2,
+   "position": "6e",
+   "doigt": 2,
+   "demiTons": 11
+  },
+  {
+   "mesure": 23,
+   "corde": 3,
+   "position": "4e",
+   "doigt": 1,
+   "demiTons": 7
+  },
+  {
+   "mesure": 23,
+   "corde": 3,
+   "position": "4e",
+   "doigt": 4,
+   "demiTons": 10
+  },
+  {
+   "mesure": 23,
+   "corde": 3,
+   "position": "4e",
+   "doigt": 2,
+   "demiTons": 8
+  },
+  {
+   "mesure": 23,
+   "corde": 3,
+   "position": "4e",
+   "doigt": 1,
+   "demiTons": 7
+  },
+  {
+   "mesure": 23,
+   "corde": 3,
+   "position": "4e",
+   "doigt": 4,
+   "demiTons": 10
+  },
+  {
+   "mesure": 23,
+   "corde": 3,
+   "position": "6e",
+   "doigt": 4,
+   "demiTons": 13
+  },
+  {
+   "mesure": 23,
+   "corde": 3,
+   "position": "6e",
+   "doigt": 3,
+   "demiTons": 12
+  },
+  {
+   "mesure": 23,
+   "corde": 3,
+   "position": "6e",
+   "doigt": 1,
+   "demiTons": 10
+  },
+  {
+   "mesure": 23,
+   "corde": 3,
+   "position": "P14",
+   "doigt": 1,
+   "demiTons": 16
+  },
+  {
+   "mesure": 23,
+   "corde": 3,
+   "position": "P14",
+   "doigt": 3,
+   "demiTons": 19
+  },
+  {
+   "mesure": 23,
+   "corde": 3,
+   "position": "P14",
+   "doigt": 2,
+   "demiTons": 17
+  },
+  {
+   "mesure": 24,
+   "corde": 3,
+   "position": "P14",
+   "doigt": 1,
+   "demiTons": 16
+  },
+  {
+   "mesure": 25,
+   "corde": 3,
+   "position": "P14",
+   "doigt": 2,
+   "demiTons": 17
+  },
+  {
+   "mesure": 25,
+   "corde": 3,
+   "position": "P14",
+   "doigt": 3,
+   "demiTons": 19
+  },
+  {
+   "mesure": 25,
+   "corde": 3,
+   "position": "P15",
+   "doigt": 3,
+   "demiTons": 20
+  },
+  {
+   "mesure": 25,
+   "corde": 3,
+   "position": "P15",
+   "doigt": 2,
+   "demiTons": 19
+  },
+  {
+   "mesure": 25,
+   "corde": 3,
+   "position": "P15",
+   "doigt": 1,
+   "demiTons": 17
+  },
+  {
+   "mesure": 25,
+   "corde": 3,
+   "position": "P15",
+   "doigt": 1,
+   "demiTons": 17
+  },
+  {
+   "mesure": 25,
+   "corde": 3,
+   "position": "P15",
+   "doigt": "P",
+   "demiTons": 15
+  },
+  {
+   "mesure": 25,
+   "corde": 3,
+   "position": "6e",
+   "doigt": 4,
+   "demiTons": 13
+  },
+  {
+   "mesure": 25,
+   "corde": 3,
+   "position": "6e",
+   "doigt": 3,
+   "demiTons": 12
+  },
+  {
+   "mesure": 26,
+   "corde": 3,
+   "position": "6e",
+   "doigt": 1,
+   "demiTons": 10
+  },
+  {
+   "mesure": 26,
+   "corde": 3,
+   "position": "6e",
+   "doigt": 3,
+   "demiTons": 12
+  },
+  {
+   "mesure": 26,
+   "corde": 3,
+   "position": "6e",
+   "doigt": 4,
+   "demiTons": 13
+  },
+  {
+   "mesure": 26,
+   "corde": 3,
+   "position": "6e",
+   "doigt": 3,
+   "demiTons": 12
+  },
+  {
+   "mesure": 26,
+   "corde": 3,
+   "position": "6e",
+   "doigt": 1,
+   "demiTons": 10
+  },
+  {
+   "mesure": 26,
+   "corde": 3,
+   "position": "6e",
+   "doigt": 1,
+   "demiTons": 10
+  },
+  {
+   "mesure": 26,
+   "corde": 3,
+   "position": "3e",
+   "doigt": 4,
+   "demiTons": 8
+  },
+  {
+   "mesure": 26,
+   "corde": 3,
+   "position": "3e",
+   "doigt": 3,
+   "demiTons": 7
+  },
+  {
+   "mesure": 26,
+   "corde": 3,
+   "position": "2e",
+   "doigt": 3,
+   "demiTons": 5
+  },
+  {
+   "mesure": 26,
+   "corde": 3,
+   "position": "2e",
+   "doigt": 2,
+   "demiTons": 4
+  },
+  {
+   "mesure": 27,
+   "corde": 3,
+   "position": "2e",
+   "doigt": 3,
+   "demiTons": 5
+  },
+  {
+   "mesure": 27,
+   "corde": 3,
+   "position": "3e",
+   "doigt": 3,
+   "demiTons": 7
+  },
+  {
+   "mesure": 27,
+   "corde": 3,
+   "position": "3e",
+   "doigt": 4,
+   "demiTons": 8
+  },
+  {
+   "mesure": 27,
+   "corde": 3,
+   "position": "3e",
+   "doigt": 4,
+   "demiTons": 8
+  },
+  {
+   "mesure": 27,
+   "corde": 3,
+   "position": "3e",
+   "doigt": 3,
+   "demiTons": 7
+  },
+  {
+   "mesure": 27,
+   "corde": 3,
+   "position": "3e",
+   "doigt": 4,
+   "demiTons": 8
+  },
+  {
+   "mesure": 27,
+   "corde": 3,
+   "position": "3e",
+   "doigt": 3,
+   "demiTons": 7
+  },
+  {
+   "mesure": 28,
+   "corde": 3,
+   "position": "3e",
+   "doigt": 1,
+   "demiTons": 5
+  },
+  {
+   "mesure": 28,
+   "corde": 3,
+   "position": "3e",
+   "doigt": 4,
+   "demiTons": 8
+  },
+  {
+   "mesure": 28,
+   "corde": 3,
+   "position": "4e",
+   "doigt": 4,
+   "demiTons": 10
+  },
+  {
+   "mesure": 28,
+   "corde": 3,
+   "position": "4e",
+   "doigt": 2,
+   "demiTons": 8
+  },
+  {
+   "mesure": 28,
+   "corde": 3,
+   "position": "4e",
+   "doigt": 4,
+   "demiTons": 10
+  },
+  {
+   "mesure": 28,
+   "corde": 3,
+   "position": "6e",
+   "doigt": 3,
+   "demiTons": 12
+  },
+  {
+   "mesure": 28,
+   "corde": 3,
+   "position": "6e",
+   "doigt": 3,
+   "demiTons": 12
+  },
+  {
+   "mesure": 29,
+   "corde": 3,
+   "position": "6e",
+   "doigt": 3,
+   "demiTons": 12
+  },
+  {
+   "mesure": 29,
+   "corde": 1,
+   "position": "7e",
+   "doigt": 4,
+   "demiTons": 15
+  },
+  {
+   "mesure": 29,
+   "corde": 2,
+   "position": "P12",
+   "doigt": 2,
+   "demiTons": 15
+  },
+  {
+   "mesure": 29,
+   "corde": 2,
+   "position": "P12",
+   "doigt": 3,
+   "demiTons": 17
+  },
+  {
+   "mesure": 29,
+   "corde": 2,
+   "position": "P12",
+   "doigt": 2,
+   "demiTons": 15
+  },
+  {
+   "mesure": 29,
+   "corde": 2,
+   "position": "P12",
+   "doigt": 3,
+   "demiTons": 17
+  },
+  {
+   "mesure": 29,
+   "corde": 3,
+   "position": "7e",
+   "doigt": 1,
+   "demiTons": 12
+  },
+  {
+   "mesure": 29,
+   "corde": 3,
+   "position": "7e",
+   "doigt": 1,
+   "demiTons": 12
+  },
+  {
+   "mesure": 30,
+   "corde": 3,
+   "position": "7e",
+   "doigt": 1,
+   "demiTons": 12
+  },
+  {
+   "mesure": 30,
+   "corde": 2,
+   "position": "P12",
+   "doigt": "P",
+   "demiTons": 12
+  },
+  {
+   "mesure": 30,
+   "corde": 2,
+   "position": "P12",
+   "doigt": 2,
+   "demiTons": 15
+  },
+  {
+   "mesure": 30,
+   "corde": 2,
+   "position": "P12",
+   "doigt": 3,
+   "demiTons": 17
+  },
+  {
+   "mesure": 30,
+   "corde": 2,
+   "position": "P12",
+   "doigt": 2,
+   "demiTons": 15
+  },
+  {
+   "mesure": 30,
+   "corde": 3,
+   "position": "6e",
+   "doigt": 1,
+   "demiTons": 10
+  },
+  {
+   "mesure": 30,
+   "corde": 3,
+   "position": "6e",
+   "doigt": 3,
+   "demiTons": 12
+  },
+  {
+   "mesure": 30,
+   "corde": 3,
+   "position": "6e",
+   "doigt": 3,
+   "demiTons": 12
+  },
+  {
+   "mesure": 31,
+   "corde": 2,
+   "position": "6e",
+   "doigt": 2,
+   "demiTons": 11
+  },
+  {
+   "mesure": 31,
+   "corde": 3,
+   "position": "4e",
+   "doigt": 1,
+   "demiTons": 7
+  },
+  {
+   "mesure": 31,
+   "corde": 3,
+   "position": "4e",
+   "doigt": 4,
+   "demiTons": 10
+  },
+  {
+   "mesure": 31,
+   "corde": 3,
+   "position": "4e",
+   "doigt": 2,
+   "demiTons": 8
+  },
+  {
+   "mesure": 31,
+   "corde": 3,
+   "position": "4e",
+   "doigt": 1,
+   "demiTons": 7
+  },
+  {
+   "mesure": 31,
+   "corde": 3,
+   "position": "4e",
+   "doigt": 4,
+   "demiTons": 10
+  },
+  {
+   "mesure": 31,
+   "corde": 3,
+   "position": "6e",
+   "doigt": 4,
+   "demiTons": 13
+  },
+  {
+   "mesure": 31,
+   "corde": 3,
+   "position": "6e",
+   "doigt": 3,
+   "demiTons": 12
+  },
+  {
+   "mesure": 31,
+   "corde": 3,
+   "position": "6e",
+   "doigt": 1,
+   "demiTons": 10
+  },
+  {
+   "mesure": 31,
+   "corde": 3,
+   "position": "P14",
+   "doigt": 1,
+   "demiTons": 16
+  },
+  {
+   "mesure": 31,
+   "corde": 3,
+   "position": "P14",
+   "doigt": 3,
+   "demiTons": 19
+  },
+  {
+   "mesure": 31,
+   "corde": 3,
+   "position": "P14",
+   "doigt": 2,
+   "demiTons": 17
+  },
+  {
+   "mesure": 32,
+   "corde": 3,
+   "position": "P14",
+   "doigt": 1,
+   "demiTons": 16
+  },
+  {
+   "mesure": 33,
+   "corde": 3,
+   "position": "P14",
+   "doigt": 2,
+   "demiTons": 17
+  },
+  {
+   "mesure": 33,
+   "corde": 3,
+   "position": "P14",
+   "doigt": 3,
+   "demiTons": 19
+  },
+  {
+   "mesure": 33,
+   "corde": 3,
+   "position": "P15",
+   "doigt": 3,
+   "demiTons": 20
+  },
+  {
+   "mesure": 33,
+   "corde": 3,
+   "position": "P15",
+   "doigt": 2,
+   "demiTons": 19
+  },
+  {
+   "mesure": 33,
+   "corde": 3,
+   "position": "P15",
+   "doigt": 1,
+   "demiTons": 17
+  },
+  {
+   "mesure": 33,
+   "corde": 3,
+   "position": "P15",
+   "doigt": 1,
+   "demiTons": 17
+  },
+  {
+   "mesure": 33,
+   "corde": 3,
+   "position": "P15",
+   "doigt": "P",
+   "demiTons": 15
+  },
+  {
+   "mesure": 33,
+   "corde": 3,
+   "position": "6e",
+   "doigt": 4,
+   "demiTons": 13
+  },
+  {
+   "mesure": 33,
+   "corde": 3,
+   "position": "6e",
+   "doigt": 3,
+   "demiTons": 12
+  },
+  {
+   "mesure": 34,
+   "corde": 3,
+   "position": "6e",
+   "doigt": 1,
+   "demiTons": 10
+  },
+  {
+   "mesure": 34,
+   "corde": 3,
+   "position": "6e",
+   "doigt": 3,
+   "demiTons": 12
+  },
+  {
+   "mesure": 34,
+   "corde": 3,
+   "position": "6e",
+   "doigt": 4,
+   "demiTons": 13
+  },
+  {
+   "mesure": 34,
+   "corde": 3,
+   "position": "6e",
+   "doigt": 3,
+   "demiTons": 12
+  },
+  {
+   "mesure": 34,
+   "corde": 3,
+   "position": "6e",
+   "doigt": 1,
+   "demiTons": 10
+  },
+  {
+   "mesure": 34,
+   "corde": 3,
+   "position": "6e",
+   "doigt": 1,
+   "demiTons": 10
+  },
+  {
+   "mesure": 34,
+   "corde": 2,
+   "position": "7e",
+   "doigt": 4,
+   "demiTons": 15
+  },
+  {
+   "mesure": 34,
+   "corde": 2,
+   "position": "7e",
+   "doigt": 3,
+   "demiTons": 14
+  },
+  {
+   "mesure": 34,
+   "corde": 2,
+   "position": "6e",
+   "doigt": 3,
+   "demiTons": 12
+  },
+  {
+   "mesure": 34,
+   "corde": 2,
+   "position": "6e",
+   "doigt": 2,
+   "demiTons": 11
+  },
+  {
+   "mesure": 35,
+   "corde": 2,
+   "position": "6e",
+   "doigt": 3,
+   "demiTons": 12
+  },
+  {
+   "mesure": 35,
+   "corde": 2,
+   "position": "7e",
+   "doigt": 3,
+   "demiTons": 14
+  },
+  {
+   "mesure": 35,
+   "corde": 2,
+   "position": "7e",
+   "doigt": 4,
+   "demiTons": 15
+  },
+  {
+   "mesure": 35,
+   "corde": 2,
+   "position": "7e",
+   "doigt": 4,
+   "demiTons": 15
+  },
+  {
+   "mesure": 35,
+   "corde": 2,
+   "position": "7e",
+   "doigt": 3,
+   "demiTons": 14
+  },
+  {
+   "mesure": 35,
+   "corde": 2,
+   "position": "7e",
+   "doigt": 4,
+   "demiTons": 15
+  },
+  {
+   "mesure": 35,
+   "corde": 2,
+   "position": "7e",
+   "doigt": 3,
+   "demiTons": 14
+  },
+  {
+   "mesure": 36,
+   "corde": 2,
+   "position": "7e",
+   "doigt": 1,
+   "demiTons": 12
+  },
+  {
+   "mesure": 37,
+   "corde": 2,
+   "position": "7e",
+   "doigt": 1,
+   "demiTons": 12
+  },
+  {
+   "mesure": 38,
+   "corde": 2,
+   "position": "7e",
+   "doigt": 1,
+   "demiTons": 12
+  }
+ ],
+ "conseils": {
+  "1": {
+   "t": "Le thème entre",
+   "txt": "Fa, deuxième doigt, 4e position sur la corde de La. La note est longue : donne-lui tout l'archet et presque aucune pression, c'est une entrée, pas une attaque. Les six doubles croches qui suivent tiennent dans le même archet, légères. Le ré de la fin bascule sur la corde de Ré : premier changement de couleur du morceau, le son s'assombrit en descendant.",
+   "dark": false
+  },
+  "2": {
+   "t": "Le do dièse serré",
+   "txt": "Ré puis do dièse, sur la corde de Ré, main immobile en 6e. Le do dièse est une sensible : il doit être haut, presque collé au ré. Si tu l'entends mou, c'est qu'il est trop bas — rapproche le doigt.",
+   "dark": false
+  },
+  "3": {
+   "t": "Le la, ton point de repère",
+   "txt": "Le la, troisième doigt en 6e position, c'est l'octave de ta corde à vide. Joue-le et écoute : la corde de La doit se mettre à vibrer toute seule. Si elle reste muette, le doigt n'est pas à sa place. Le si bémol au-dessus n'est qu'un demi-ton plus loin — les deux doigts se touchent presque.",
+   "dark": false
+  },
+  "4": {
+   "t": "Le pouce se pose",
+   "txt": "Premier passage du pouce. Pose-le en travers sur la corde de La, à l'harmonique du si : do dièse, ré et mi tombent alors sous les trois premiers doigts sans que la main bouge. Prépare ce geste pendant le la qui précède, pas au moment du saut.",
+   "dark": false
+  },
+  "5": {
+   "t": "Aller, puis retour",
+   "txt": "Ré, do dièse, ré au pouce — puis la chute sur le sol dièse en 6e. Le retour vers le bas est le moment fragile : laisse le bras redescendre et porter la main. Ne tire pas avec les doigts, ils arriveraient faux.",
+   "dark": false
+  },
+  "6": {
+   "t": "La même montée, du sol dièse",
+   "txt": "C'est exactement le geste de la mesure 5, mais lancé depuis le sol dièse. Fais-le identique : l'auditeur doit reconnaître la même montée. Si tu la joues autrement, la phrase perd son dessin.",
+   "dark": false
+  },
+  "7": {
+   "t": "Le balancement",
+   "txt": "Quatre fois ré–do dièse au pouce, puis la chute sur le sol dièse. C'est une mesure de patience : chaque do dièse un peu plus serré contre son ré, et l'archet qui ne force jamais. Le balancement doit bercer, pas trépider.",
+   "dark": false
+  },
+  "8": {
+   "t": "La mesure difficile",
+   "txt": "Deux octaves, trois cordes, quatre positions : 6e sur La, 4e sur Ré, 2e puis 4e puis 6e sur La, et le pouce pour finir. C'est la mesure la plus chargée du morceau. Travaille-la à l'envers : pars du mi aigu, ajoute une note avant, puis une autre. Les arrivées se stabilisent beaucoup plus vite comme ça.",
+   "dark": false
+  },
+  "9": {
+   "t": "Le sommet : le fa aigu",
+   "txt": "Le point culminant. Le pouce avance d'un demi-ton, du si au do, et le troisième doigt atteint le fa. Ce déplacement se prépare pendant la fin de la mesure précédente — à l'instant où tu joues le mi, le bras doit déjà monter. Ensuite la descente mi–ré–do–si bémol se fait toute seule.",
+   "dark": false
+  },
+  "10": {
+   "t": "Respire",
+   "txt": "Si bémol puis la, en 7e, main immobile. Deux notes seulement : c'est une respiration. Ne la remplis pas de vibrato nerveux, laisse le son s'installer.",
+   "dark": false
+  },
+  "11": {
+   "t": "La descente chromatique",
+   "txt": "Si, do, do dièse, ré au pouce, puis si bémol, la, sol, et le fa qui tombe sur la corde de Ré en 7e. Quatre cadres de main s'enchaînent. Pense glissade contrôlée, pas quatre sauts : le bras descend d'un seul mouvement et les doigts se posent au passage.",
+   "dark": false
+  },
+  "12": {
+   "t": "La figure en doubles",
+   "txt": "Fa et mi sur la corde de Ré, puis la figure la–si bémol–la–si bémol–do–do en 7e sur la corde de La. Le passage d'une corde à l'autre est un geste d'archet, pas de main gauche : la main, elle, reste où elle est.",
+   "dark": false
+  },
+  "13": {
+   "t": "Le grand écart",
+   "txt": "Même figure qu'à la mesure 13, mais précédée d'un ré grave sur la corde de Ré. L'écart d'archet est large. La main gauche a tout son temps — c'est le bras droit qui doit anticiper, en se plaçant sur le ré avant même la fin de la note précédente.",
+   "dark": false
+  },
+  "14": {
+   "t": "La phrase se pose",
+   "txt": "Do, puis le fa sur la corde de Ré, puis sol–la–si bémol–la en 6e. C'est la fin de la grande phrase : laisse filer l'archet, diminue sans ralentir. Le dernier la doit s'éteindre, pas s'arrêter.",
+   "dark": false
+  },
+  "15": {
+   "t": "Trois notes et des silences",
+   "txt": "Sol, fa, mi, séparés par des silences, toutes en 4e position. Ne bouge pas la main : ce sont les silences qui parlent. Lève l'archet lentement entre les notes, sans couper le son net — on doit entendre la résonance mourir.",
+   "dark": false
+  },
+  "16": {
+   "t": "La blanche de repos",
+   "txt": "Un fa tenu, un seul archet, très calme. Compte-le jusqu'au bout. C'est le milieu du morceau : tout ce qui vient après est plus sombre.",
+   "dark": false
+  },
+  "17": {
+   "t": "Le mi bémol qui assombrit",
+   "txt": "Fa dièse en 4e position, puis un grand saut jusqu'au mi bémol au pouce, ré, et retour sur la corde de Ré. Ce mi bémol doit être franchement bas — c'est lui qui bascule la phrase dans l'ombre. Si tu le joues trop haut, l'effet disparaît.",
+   "dark": false
+  },
+  "18": {
+   "t": "Le son mat",
+   "txt": "Un sol tenu sur la corde de Ré, au pouce. Le son est plus mat que sur la corde de La : c'est voulu, la phrase se replie sur elle-même. Ne cherche pas à le rendre brillant.",
+   "dark": false
+  },
+  "19": {
+   "t": "Le deuxième sommet",
+   "txt": "Sol dièse, puis le fa aigu, puis la redescente. Le fa arrive de loin : prépare le pouce pendant le sol dièse, le bras monte déjà. Donne au fa un vrai appui d'archet, c'est le deuxième point haut du morceau.",
+   "dark": false
+  },
+  "20": {
+   "t": "La figure tournante",
+   "txt": "Sol dièse, la, fa, sol, fa, sol, la, la : un va-et-vient entre la 6e et la 4e position. Fais-en un seul geste de bras qui oscille, pas huit décisions séparées. Si tu penses note par note, ça devient saccadé.",
+   "dark": false
+  },
+  "21": {
+   "t": "La chute vers le si bémol",
+   "txt": "Du la aigu au si bémol grave : deux cordes d'écart d'un coup. C'est l'archet qui fait le saut, la main gauche a tout le temps de se placer. Prends le si bémol doucement, il doit surprendre, pas cogner.",
+   "dark": false
+  },
+  "22": {
+   "t": "La même, vers le ré",
+   "txt": "Même dessin qu'à la mesure 22, mais la chute se pose cette fois sur le ré de la corde de Ré en 6e. Compare les deux : la seconde chute est moins profonde, elle prépare la montée qui vient.",
+   "dark": false
+  },
+  "23": {
+   "t": "La grande gamme",
+   "txt": "Douze doubles croches en montant, de la corde de Ré jusqu'au pouce, en traversant quatre positions. Travaille-la à l'envers, par groupes de trois notes en partant de la fin. Garde le même archet léger du début à la fin : c'est la main gauche qui fait le crescendo, pas la pression.",
+   "dark": false
+  },
+  "24": {
+   "t": "Le do dièse suspendu",
+   "txt": "Un do dièse seul, au pouce. Compte-le vraiment : c'est une suspension, tout le morceau attend dessus. Vibre-le, mais lentement.",
+   "dark": false
+  },
+  "25": {
+   "t": "Le troisième sommet",
+   "txt": "Ré, mi, fa aigu, puis la descente — et le do est pris par le pouce lui-même, pas par un doigt. Puis si bémol et la en 6e. C'est le dernier grand geste avant la longue retombée.",
+   "dark": false
+  },
+  "26": {
+   "t": "La longue descente",
+   "txt": "Sol, la, si bémol, la, sol, sol, fa, mi, ré, do dièse : de la 6e position jusqu'à la 2e. La main glisse d'une seule traite. Ne t'arrête pas en route pour vérifier chaque note — fixe le do dièse d'arrivée et laisse le bras y aller.",
+   "dark": false
+  },
+  "27": {
+   "t": "Le trille écrit",
+   "txt": "Ré, mi, fa, fa, mi, fa, mi, entre la 2e et la 3e position. Ce sont les troisième et quatrième doigts qui travaillent : garde-les souples, à peine levés. Un trille dur vient toujours d'un poignet crispé.",
+   "dark": false
+  },
+  "28": {
+   "t": "La remontée",
+   "txt": "Ré, fa, sol, fa, sol, la, la : la main remonte de la 3e à la 4e puis à la 6e. On revient vers la lumière — et vers la reprise, qui va tout changer.",
+   "dark": false
+  },
+  "29": {
+   "t": "La reprise feutrée commence",
+   "txt": "Ici commence la reprise calme. C'est exactement la phrase de la mesure 22, mais au lieu de rester sur la corde de La, tu descends chercher les notes centrales sur Sol puis Ré, haut sur le manche : le son devient feutré, voilé. Même notes, autre monde. Le si bémol grave sur la corde de Sol donne le ton, puis la main se pose au pouce sur la corde de Ré.",
+   "dark": true
+  },
+  "30": {
+   "t": "Reste dans l'ombre",
+   "txt": "On reste au pouce sur la corde de Ré pour le cœur de la mesure — et le ré est pris par le pouce lui-même. Même dessin qu'à la mesure 23, mais mat au lieu d'être clair. Écoute la différence : c'est tout l'intérêt de la reprise.",
+   "dark": true
+  },
+  "31": {
+   "t": "La gamme, version sombre",
+   "txt": "La gamme de la mesure 24, mais démarrée sur la corde de Ré. Elle retrouve la corde de La dès la deuxième note et monte en s'éclairant : c'est la sortie du passage feutré. Laisse ce retour de lumière se faire tout seul, n'ajoute pas de pression.",
+   "dark": true
+  },
+  "32": {
+   "t": "Le do dièse, à découvert",
+   "txt": "Le do dièse tenu, premier doigt devant le pouce, sur la corde de La. La couleur sombre s'arrête ici : la montée vers le sommet ne peut pas se jouer ailleurs que sur cette corde.",
+   "dark": false
+  },
+  "33": {
+   "t": "Le dernier sommet",
+   "txt": "Identique au sommet de la mesure 26 : pouce au do, troisième doigt au fa. Ici la corde de La est obligée — le fa aigu n'existe nulle part ailleurs. Joue-le plus doucement qu'à la première fois : c'est la nuance, pas la corde, qui fait la différence.",
+   "dark": false
+  },
+  "34": {
+   "t": "La retombée",
+   "txt": "La descente revient sur la corde de Ré et y reste : fa, mi, ré, do dièse en 7e puis 6e. Le morceau se replie dans la couleur sombre où il s'est réfugié. Diminue vraiment, il te reste encore deux mesures.",
+   "dark": true
+  },
+  "35": {
+   "t": "Les dernières notes",
+   "txt": "Mi, fa, fa, mi, fa, mi, toutes sur la corde de Ré, troisième et quatrième doigts. C'est le dernier mouvement avant le ré tenu. Ralentis à peine — juste assez pour qu'on sente que ça va s'arrêter.",
+   "dark": true
+  },
+  "36": {
+   "t": "Le ré final",
+   "txt": "Le ré tenu, premier doigt en 7e position sur la corde de Ré. Trois mesures d'un seul archet. Ne presse pas : laisse l'archet ralentir de lui-même et garde le vibrato jusqu'à ce que le son disparaisse. Le silence après fait partie du morceau.",
+   "dark": true
+  }
+ }
+}

@@ -16,7 +16,7 @@ export interface Route {
 
 export const ROUTES: Route[] = [
   { id: 'aujourdhui', titre: "Aujourd'hui", resume: 'La séance du jour, construite selon ton temps et ton énergie.', largeur: 'etroite' },
-  { id: 'positions', titre: 'Positions', etape: 'J1', resume: 'Cartographie du manche de la ½ à la 7ᵉ position, nom des notes sous les doigts, démanchés.' },
+  { id: 'positions', titre: 'Positions', resume: 'Cartographie du manche de la ½ à la 7ᵉ position, nom des notes sous les doigts, démanchés.' },
   { id: 'morceaux', titre: 'Morceaux', etape: 'J2', resume: 'Bibliothèque, morceaux-objectifs, lecteur avec partition, son, boucle et manche synchronisé.' },
   { id: 'lecture', titre: 'Lecture', etape: 'J4', resume: 'Lire vite en clé de fa, puis d’ut et de sol, par repères et par écarts.' },
   { id: 'gammes', titre: 'Gammes', etape: 'J4', resume: 'Gammes et arpèges sur bourdon, avec la justesse mesurée au micro.' },

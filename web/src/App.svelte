@@ -6,6 +6,7 @@
   import Aujourdhui from './pages/Aujourdhui.svelte';
   import Reglages from './pages/Reglages.svelte';
   import AVenir from './pages/AVenir.svelte';
+  import Positions from './pages/Positions.svelte';
   import StatutSauvegarde from './pages/StatutSauvegarde.svelte';
 
   let route = $state(routeDepuisHash(location.hash));
@@ -40,6 +41,8 @@
     <Aujourdhui />
   {:else if route.id === 'reglages'}
     <Reglages />
+  {:else if route.id === 'positions'}
+    <Positions />
   {:else}
     <AVenir {route} />
   {/if}
