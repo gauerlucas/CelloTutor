@@ -1,0 +1,7 @@
+node_modules/
+__pycache__/
+*.pyc
+# La progression vit hors du dépôt (../donnees), mais au cas où :
+donnees/
+.DS_Store
+Thumbs.db
