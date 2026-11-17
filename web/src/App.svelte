@@ -15,6 +15,10 @@
   import BarreSeance from './components/BarreSeance.svelte';
   import BilanSeance from './components/BilanSeance.svelte';
   import { seance } from './lib/seance.svelte';
+  import { contexteAudio, reglerTimbre, reglerVolume } from './lib/audio/son';
+  // Dès le premier geste, l'audio s'ouvre et les échantillons se décodent : la première note
+  // jouée a déjà le vrai son.
+  if (typeof window !== 'undefined') window.addEventListener('pointerdown', () => contexteAudio(), { once: true });
 
   let route = $state(routeDepuisHash(location.hash));
   let params = $state(parametresDepuisHash(location.hash));
@@ -31,6 +35,10 @@
   });
 
   $effect(() => appliquerAffichage(stockage.etat.reglages));
+  $effect(() => {
+    reglerVolume(stockage.etat.reglages.volume);
+    reglerTimbre(stockage.etat.reglages.timbre);
+  });
   $effect(() => {
     document.title = route.id === 'aujourdhui' ? 'CelloTutor' : `${route.titre} · CelloTutor`;
   });

@@ -2,6 +2,7 @@
   import { stockage } from '../lib/stockage.svelte';
   import { exporterFichier, importerFichier } from '../lib/persistance';
   import type { Etat } from '../lib/etat';
+  import { jouer, reglerTimbre, type Timbre } from '../lib/audio/son';
 
   const r = $derived(stockage.etat.reglages);
   let messageImport = $state('');
@@ -69,10 +70,18 @@
     </select>
   </label>
   <label class="ligne">
+    <span class="etiquette">Son des notes</span>
+    <select value={r.timbre} onchange={(e) => { const t = e.currentTarget.value as Timbre; stockage.regler('timbre', t); reglerTimbre(t); setTimeout(() => jouer(57, 1.5), 300); }}>
+      <option value="echantillons">Violoncelle enregistré</option>
+      <option value="synthese">Synthèse (plus léger)</option>
+    </select>
+  </label>
+  <label class="ligne">
     <span class="etiquette">Volume</span>
     <input type="range" min="0" max="1" step="0.05" value={r.volume} onchange={(e) => stockage.regler('volume', Number(e.currentTarget.value))} />
     <span class="discret">{Math.round(r.volume * 100)} %</span>
   </label>
+  <p class="discret credit">Sons de violoncelle : pack « real cello notes » de flcellogrl sur Freesound (<a href="https://freesound.org/people/flcellogrl/packs/12408/" target="_blank" rel="noopener">lien</a>), licence CC BY 4.0. Les notes absentes du pack sont transposées depuis la plus proche.</p>
 </section>
 
 <section class="carte bloc">
@@ -103,4 +112,5 @@
   label.btn { display: inline-flex; align-items: center; }
   select { font: inherit; padding: .3em .5em; border-radius: 7px; border: 1px solid var(--rule); background: var(--surface); color: var(--ink); }
   code { font-family: var(--f-mono); font-size: .88em; word-break: break-all; }
+  .credit { font-size: .8rem; margin: .6rem 0 0; }
 </style>
