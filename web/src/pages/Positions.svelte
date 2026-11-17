@@ -4,6 +4,8 @@
   import Portee, { type NotePortee } from '../components/Portee.svelte';
   import ChoixNote from '../components/ChoixNote.svelte';
   import Jauge from '../components/Jauge.svelte';
+  import Ecoute from '../components/Ecoute.svelte';
+  import { DetecteurTenue, OPTIONS_TENUE, TENUES, ecartCible, type Retour } from '../lib/audio/tenue';
   import BoutonMicro from '../components/BoutonMicro.svelte';
   import { stockage } from '../lib/stockage.svelte';
   import { micro } from '../lib/audio/micro.svelte';
@@ -115,13 +117,16 @@
   let fileDem = nouvelleFile(4);
   let verdict = $state<'juste' | 'haut' | 'bas' | null>(null);
   let debutDem = 0;
-  let tenue = 0;
+  const detecteurDem = new DetecteurTenue({ ...OPTIONS_TENUE, fenetreCents: 70 });
+  let retourDem = $state<Retour | null>(null);
 
   function nouveauDemanche() {
     const pool = trajet ? demanchesDe(trajet[0], trajet[1]) : TRAJETS.flatMap(([a, b]) => demanchesDe(a, b)).filter((d) => Math.abs(position(d.de)!.ff - position(d.vers)!.ff) <= 7);
     dem = choisir(pool, stockage.etat, fileDem);
     verdict = null;
-    tenue = 0;
+    retourDem = null;
+    detecteurDem.regler({ tenueMs: TENUES[stockage.etat.reglages.tenueMicro] });
+    detecteurDem.viser(dem?.midiArrivee ?? null);
     debutDem = performance.now();
   }
   function ecouterDemanche() {
@@ -142,19 +147,20 @@
     stockage.modifie();
   }
 
-  // Écoute de l'arrivée au micro : une note tenue près de la cible est jugée.
-  const centsArrivee = $derived(dem && micro.ecoute.midi != null && Math.abs(micro.ecoute.midi - dem.midiArrivee) < 1
-    ? Math.round((micro.ecoute.midi - dem.midiArrivee) * 100) : null);
+  // Écoute de l'arrivée au micro : une note tenue près de la cible est jugée (juste, haute, basse).
+  const centsArrivee = $derived(dem && micro.ecoute.midi != null && Math.abs(ecartCible(micro.ecoute.midi, dem.midiArrivee, true)) < 100
+    ? Math.round(ecartCible(micro.ecoute.midi, dem.midiArrivee, true)) : null);
   $effect(() => {
-    if (mode !== 'demanche' || !dem || verdict || centsArrivee == null) {
-      tenue = 0;
-      return;
-    }
-    tenue++;
-    if (tenue >= 6) {
-      verdict = jugerArrivee(dem.midiArrivee + centsArrivee / 100, dem.midiArrivee);
-      noterDemanche(verdict === 'juste');
-    }
+    const l = micro.ecoute;
+    untrack(() => {
+      if (mode !== 'demanche' || !dem || verdict) return;
+      const r = detecteurDem.pousser({ midi: l.midi, t: l.t });
+      retourDem = r;
+      if (r.etat === 'valide') {
+        verdict = jugerArrivee(dem.midiArrivee + (r.ecartMedian ?? 0) / 100, dem.midiArrivee);
+        noterDemanche(verdict === 'juste');
+      }
+    });
   });
 
   // ------------------------------------------------------------- changements de mode / position
@@ -305,6 +311,7 @@
         </div>
         {#if micro.actif}
           <Jauge cents={centsArrivee} tolerance={25} libelle={nomNote(deMidi(dem.midiArrivee), style)} />
+          {#if !verdict}<Ecoute retour={retourDem} cible={dem.midiArrivee} {style} />{/if}
           <p class="discret">Tiens la note d’arrivée une demi-seconde : elle est jugée automatiquement (±25 cents).</p>
         {/if}
         {#if verdict}

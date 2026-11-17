@@ -3,6 +3,8 @@
   // et « imagine la note » (audiation) sans instrument.
   import { untrack } from 'svelte';
   import Jauge from '../components/Jauge.svelte';
+  import Ecoute from '../components/Ecoute.svelte';
+  import { DetecteurTenue, OPTIONS_TENUE, TENUES, ecartCible, type Retour } from '../lib/audio/tenue';
   import BoutonMicro from '../components/BoutonMicro.svelte';
   import Portee from '../components/Portee.svelte';
   import ChoixNote from '../components/ChoixNote.svelte';
@@ -33,11 +35,12 @@
   let posJ = $state('1');
   let cible = $state<number | null>(null);
   let bourdon = $state(false);
-  let tenue = 0;
+  const detecteur = new DetecteurTenue({ ...OPTIONS_TENUE, fenetreCents: 15 });
+  let retourTenue = $state<Retour | null>(null);
   let reussi = $state(false);
   let debut = 0;
   let compte = $state({ faites: 0, essais: 0 });
-  const TOL = 12;
+  const TOL = 15;
 
   function nouvelleCible() {
     const p = position(posJ)!;
@@ -46,23 +49,22 @@
     if (m === cible && cs.length > 1) m = cs[(cs.findIndex((c) => c.midi === m) + 1) % cs.length]!.midi;
     cible = m;
     reussi = false;
-    tenue = 0;
+    detecteur.regler({ tenueMs: 2 * TENUES[stockage.etat.reglages.tenueMicro] });
+    detecteur.viser(m);
+    retourTenue = null;
     debut = performance.now();
     jouer(m, 1.2);
     if (bourdon) demarrerBourdon(36 + ((m - 36) % 12)); // la même note, dans le grave
   }
-  const centsCible = $derived(cible != null && micro.ecoute.midi != null && Math.abs(micro.ecoute.midi - cible) < 1 ? Math.round((micro.ecoute.midi - cible) * 100) : null);
+  const centsBrut = $derived(cible != null && micro.ecoute.midi != null ? Math.round(ecartCible(micro.ecoute.midi, cible, true)) : null);
+  const centsCible = $derived(centsBrut != null && Math.abs(centsBrut) <= 100 ? centsBrut : null);
   $effect(() => {
-    const c = centsCible;
-    void micro.ecoute;
+    const l = micro.ecoute;
     untrack(() => {
       if (mode !== 'justesse' || reussi || cible == null) return;
-      if (c == null || Math.abs(c) > TOL) {
-        tenue = 0;
-        return;
-      }
-      tenue++;
-      if (tenue >= 11) {
+      const r = detecteur.pousser({ midi: l.midi, t: l.t });
+      retourTenue = r;
+      if (r.etat === 'valide') {
         reussi = true;
         compte.faites++;
         enregistrerReponse(stockage.etat, `O|justesse|${cible}`, true, performance.now() - debut);
@@ -144,6 +146,7 @@
     <section class="carte">
       <Jauge cents={centsCible} tolerance={TOL} libelle={cible != null ? nomNote(deMidi(cible), style, true) : ''} />
       <p class={`centre ${reussi ? 'bien' : 'discret'}`}>{reussi ? 'Juste ! Note suivante…' : micro.actif ? 'Tiens la note dans la zone verte.' : 'Active le micro pour être jugé.'}</p>
+      {#if micro.actif && !reussi}<div class="centre"><Ecoute retour={retourTenue} {cible} {style} /></div>{/if}
     </section>
     <section class="carte colonne">
       {#if cible != null}

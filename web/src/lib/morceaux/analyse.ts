@@ -5,6 +5,7 @@ import type { Etat } from '../etat';
 import type { FicheMorceau } from '../morceaux';
 import { doigtesMorceau, type Doigte } from './doigte';
 import { analyser, toniqueDe, type Partition } from './partition';
+import { correctionsDe } from './suivi';
 import { competencesDe, decouper, preparation, reperesDe, SEUIL_PRET, type Competence, type Passage, type Preparation } from './passages';
 
 export interface PassageAnalyse extends Passage {
@@ -48,10 +49,11 @@ export function analyserMorceau(f: FicheMorceau, etat: Etat): AnalyseMorceau | n
     return null;
   }
   const suivi = etat.morceaux[f.id];
-  const cle = JSON.stringify(suivi?.doigtes ?? {}) + f.xml.length;
+  const corrections = correctionsDe(suivi);
+  const cle = JSON.stringify(corrections) + f.xml.length + '|' + (f.transposition ?? 0);
   let d = cacheDoigtes.get(f.id);
   if (!d || d.cle !== cle) {
-    d = { cle, d: doigtesMorceau(partition.notes, f.doigtes ?? null, suivi?.doigtes ?? {}) };
+    d = { cle, d: doigtesMorceau(partition.notes, f.doigtes ?? null, corrections) };
     cacheDoigtes.set(f.id, d);
   }
   const doigtes = d.d;

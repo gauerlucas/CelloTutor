@@ -13,6 +13,8 @@ export interface Reglages {
   nomsNotes: NomsNotes;
   volume: number; // 0 → 1
   dureeParDefaut: number; // minutes
+  /** Temps qu'une note doit être tenue pour que le micro la valide. */
+  tenueMicro: 'courte' | 'normale' | 'longue';
 }
 
 /** État de répétition espacée d'un exercice (boîtes 0 → 5, comme dans l'ébauche B). */
@@ -66,6 +68,10 @@ export interface EtatMorceau {
   passages: Record<number, number>;
   tempo?: number;
   cle?: 'fa' | 'ut' | 'sol' | 'origine';
+  /** Transposition en demi-tons (négatif = plus grave) ; absente = hauteur d'origine. */
+  transposition?: number;
+  /** Doigtés corrigés pour une version transposée, par transposition puis par indice de note. */
+  doigtesT?: Record<string, Record<number, DoigteNote>>;
 }
 
 export interface MorceauImporte {
@@ -94,6 +100,7 @@ export const REGLAGES_DEFAUT: Reglages = {
   nomsNotes: 'latin',
   volume: 0.6,
   dureeParDefaut: 60,
+  tenueMicro: 'normale',
 };
 
 export function etatInitial(maintenant = Date.now()): Etat {
@@ -133,6 +140,7 @@ export function normaliser(brut: unknown): Etat | null {
   if (reglages.taillePupitre === 1 || reglages.taillePupitre === 1.2 || reglages.taillePupitre === 1.4) r.taillePupitre = reglages.taillePupitre;
   if (reglages.nomsNotes === 'latin' || reglages.nomsNotes === 'anglo') r.nomsNotes = reglages.nomsNotes;
   if (typeof reglages.volume === 'number' && reglages.volume >= 0 && reglages.volume <= 1) r.volume = reglages.volume;
+  if (reglages.tenueMicro === 'courte' || reglages.tenueMicro === 'normale' || reglages.tenueMicro === 'longue') r.tenueMicro = reglages.tenueMicro;
   if (typeof reglages.dureeParDefaut === 'number' && reglages.dureeParDefaut >= 5 && reglages.dureeParDefaut <= 240) r.dureeParDefaut = reglages.dureeParDefaut;
   return {
     version: VERSION_ETAT,

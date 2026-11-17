@@ -19,12 +19,12 @@ export function decimer(x: Float32Array, sr: number, cible = 16000): { y: Float3
   return { y, sr: sr / f };
 }
 
-export function detecterHauteur(x: Float32Array, sr: number, fmin = 55, fmax = 1150): Mesure | null {
+export function detecterHauteur(x: Float32Array, sr: number, fmin = 55, fmax = 1150, rmsMin = 0.006): Mesure | null {
   const N = x.length;
   let rms = 0;
   for (let i = 0; i < N; i++) rms += x[i]! * x[i]!;
   rms = Math.sqrt(rms / N);
-  if (rms < 0.006) return null;
+  if (rms < rmsMin) return null;
   const tauMin = Math.floor(sr / fmax), tauMax = Math.min(N - 2, Math.ceil(sr / fmin));
   const nsdf = new Float32Array(tauMax + 2);
   for (let tau = tauMin; tau <= tauMax; tau++) {

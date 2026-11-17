@@ -5,6 +5,8 @@
   import Portee, { type NotePortee } from '../components/Portee.svelte';
   import Manche, { type Marque } from '../components/Manche.svelte';
   import Jauge from '../components/Jauge.svelte';
+  import Ecoute from '../components/Ecoute.svelte';
+  import { DetecteurTenue, OPTIONS_TENUE, TENUES, type Retour } from '../lib/audio/tenue';
   import BoutonMicro from '../components/BoutonMicro.svelte';
   import { stockage } from '../lib/stockage.svelte';
   import { micro } from '../lib/audio/micro.svelte';
@@ -73,34 +75,36 @@
   let suivi = $state(false);
   let k = $state(0);
   let ecarts = $state<(number | null)[]>([]);
-  let tenue: number[] = [];
   let debutSuivi = 0;
   const TOL = 15;
+  const detecteur = new DetecteurTenue({ ...OPTIONS_TENUE, fenetreCents: 55 });
+  let retourTenue = $state<Retour | null>(null);
 
   function demarrerSuivi() {
     arreter();
     suivi = true;
     k = 0;
     ecarts = notes.map(() => null);
-    tenue = [];
     debutSuivi = performance.now();
+    detecteur.regler({ tenueMs: TENUES[stockage.etat.reglages.tenueMicro] });
+    detecteur.viser(null);
     void micro.demarrer();
   }
   const cible = $derived(suivi ? notes[k]?.midi ?? null : null);
-  const centsCible = $derived(cible != null && micro.ecoute.midi != null && Math.abs(micro.ecoute.midi - cible) < 0.8 ? Math.round((micro.ecoute.midi - cible) * 100) : null);
+  // Chaque note de la gamme est une cible distincte, même si deux notes voisines ont la même hauteur.
   $effect(() => {
-    const c = centsCible;
-    void micro.ecoute;
+    const c = cible, i = k;
+    untrack(() => detecteur.viser(c == null ? null : c + i * 1e-7));
+  });
+  const centsCible = $derived(retourTenue?.etat === 'approche' || retourTenue?.etat === 'valide' ? retourTenue.cents : null);
+  $effect(() => {
+    const l = micro.ecoute;
     untrack(() => {
-      if (!suivi || c == null) {
-        tenue = [];
-        return;
-      }
-      tenue.push(c);
-      if (tenue.length >= 6) {
-        const tri = [...tenue].sort((a, b) => a - b);
-        ecarts[k] = tri[Math.floor(tri.length / 2)]!;
-        tenue = [];
+      if (!suivi) return;
+      const r = detecteur.pousser({ midi: l.midi, t: l.t });
+      retourTenue = r;
+      if (r.etat === 'valide') {
+        ecarts[k] = r.ecartMedian ?? r.cents;
         if (k + 1 >= notes.length) finirSuivi();
         else k++;
       }
@@ -203,6 +207,7 @@
         <p class="etiquette">Justesse au micro</p>
         {#if suivi}
           <p>Joue la note {k + 1} sur {notes.length} : <b>{nomNote(notes[k]!.note, style, true)}</b>, et tiens-la un instant.</p>
+          <Ecoute retour={retourTenue} cible={notes[k]!.midi} {style} />
           <div class="barre">
             <button class="btn" onclick={() => { ecarts[k] = null; if (k + 1 >= notes.length) finirSuivi(); else k++; }}>Passer cette note</button>
             <button class="btn" onclick={finirSuivi}>Arrêter</button>
