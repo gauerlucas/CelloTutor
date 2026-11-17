@@ -80,7 +80,7 @@ export function jouerEchantillon(c: AudioContext, sortie: AudioNode, m: number, 
   src.playbackRate.value = vitesse;
   const [d, f] = e.boucle;
   const longueur = e.buffer.duration / vitesse;
-  if (duree + 0.3 > longueur && f > d + 0.1) {
+  if (duree + 0.45 > longueur && f > d + 0.1) {
     src.loop = true;
     src.loopStart = d;
     src.loopEnd = f;
@@ -88,13 +88,13 @@ export function jouerEchantillon(c: AudioContext, sortie: AudioNode, m: number, 
   const g = c.createGain();
   const a = e.gain * (0.55 + 0.45 * force);
   const fin = t + duree;
-  // Les attaques enregistrées sont gardées ; la fin est un relâché d'archet court.
+  // Attaque déjà raccourcie à la préparation ; le relâché commence à la fin écrite de la note et
+  // déborde un peu sur la suivante, comme un archet qui change de sens (legato, pas staccato).
   g.gain.setValueAtTime(a, t);
-  g.gain.setValueAtTime(a, Math.max(t + 0.02, fin - 0.04));
-  g.gain.exponentialRampToValueAtTime(0.0001, fin + 0.22);
+  g.gain.setTargetAtTime(0, fin, 0.06);
   src.connect(g);
   g.connect(sortie);
   src.start(t);
-  src.stop(fin + 0.3);
+  src.stop(fin + 0.45);
   return true;
 }
