@@ -9,7 +9,7 @@
   import { changerObjectif, importerMorceau, lireFichierPartition, statutObjectif, supprimerImporte } from '../lib/morceaux/suivi';
   import type { EtatObjectif } from '../lib/etat';
 
-  let { id = null }: { id?: string | null } = $props();
+  let { id = null, passage = null }: { id?: string | null; passage?: number | null } = $props();
 
   const fiche = $derived(id ? ficheMorceau(id, stockage.etat) : undefined);
   const morceaux = $derived(tousLesMorceaux(stockage.etat));
@@ -78,7 +78,7 @@
 {#if id}
   <p class="retour"><a href="#/morceaux">← Tous les morceaux</a></p>
   {#if fiche}
-    {#key fiche.id}<Lecteur {fiche} />{/key}
+    {#key fiche.id + '/' + passage}<Lecteur {fiche} passageInitial={passage} />{/key}
   {:else}
     <p class="carte">Ce morceau n’existe plus dans ta bibliothèque.</p>
   {/if}

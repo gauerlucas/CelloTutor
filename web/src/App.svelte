@@ -1,14 +1,20 @@
 <script lang="ts">
   import { onMount } from 'svelte';
-  import { ROUTES, parametresDepuisHash, paramsPositions, routeDepuisHash } from './lib/routes';
+  import { ROUTES, modeDe, parametresDepuisHash, paramsPositions, routeDepuisHash } from './lib/routes';
   import { stockage } from './lib/stockage.svelte';
   import { appliquerAffichage } from './lib/theme';
   import Aujourdhui from './pages/Aujourdhui.svelte';
   import Reglages from './pages/Reglages.svelte';
-  import AVenir from './pages/AVenir.svelte';
   import Positions from './pages/Positions.svelte';
   import Morceaux from './pages/Morceaux.svelte';
+  import Progression from './pages/Progression.svelte';
+  import Lecture from './pages/Lecture.svelte';
+  import Oreille from './pages/Oreille.svelte';
+  import Gammes from './pages/Gammes.svelte';
   import StatutSauvegarde from './pages/StatutSauvegarde.svelte';
+  import BarreSeance from './components/BarreSeance.svelte';
+  import BilanSeance from './components/BilanSeance.svelte';
+  import { seance } from './lib/seance.svelte';
 
   let route = $state(routeDepuisHash(location.hash));
   let params = $state(parametresDepuisHash(location.hash));
@@ -20,6 +26,7 @@
     };
     addEventListener('hashchange', surHash);
     void stockage.charger();
+    seance.restaurer();
     return () => removeEventListener('hashchange', surHash);
   });
 
@@ -39,7 +46,9 @@
     </nav>
     <StatutSauvegarde />
   </div>
+  <BarreSeance routeId={route.id} />
 </header>
+<BilanSeance />
 
 <main class="contenu" class:etroite={route.largeur === 'etroite'}>
   {#if route.id === 'aujourdhui'}
@@ -51,9 +60,15 @@
       <Positions {...paramsPositions(params)} />
     {/key}
   {:else if route.id === 'morceaux'}
-    <Morceaux id={params[0] ?? null} />
-  {:else}
-    <AVenir {route} />
+    <Morceaux id={params[0] ?? null} passage={params[1] ? Number(params[1]) - 1 : null} />
+  {:else if route.id === 'lecture'}
+    {#key params.join('/')}<Lecture modeInitial={modeDe(params[0], ['nommer', 'suite', 'morceaux', 'revisions'], 'nommer')} />{/key}
+  {:else if route.id === 'oreille'}
+    {#key params.join('/')}<Oreille modeInitial={modeDe(params[0], ['cordes', 'justesse', 'imagine'], 'cordes')} />{/key}
+  {:else if route.id === 'gammes'}
+    {#key params.join('/')}<Gammes idInitial={params[0] ?? null} />{/key}
+  {:else if route.id === 'progression'}
+    <Progression />
   {/if}
 </main>
 

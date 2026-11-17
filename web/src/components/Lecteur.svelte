@@ -15,9 +15,10 @@
   import { CORDES } from '../lib/musique/violoncelle';
   import { deMidi, nomNote } from '../lib/musique/notes';
   import { jourDe } from '../lib/revision';
+  import { seance } from '../lib/seance.svelte';
   import type { Cle } from '../lib/musique/cles';
 
-  let { fiche }: { fiche: FicheMorceau } = $props();
+  let { fiche, passageInitial = null }: { fiche: FicheMorceau; passageInitial?: number | null } = $props();
 
   // ------------------------------------------------------------- données du morceau
   const lu = $derived.by<{ p: Partition | null; err: string }>(() => {
@@ -90,8 +91,17 @@
 
   // ------------------------------------------------------------- sélection et lecture
   let selection = $state<number | null>(null);
+  // Ouvert sur un passage (depuis la séance) : on se place sur sa première note.
+  let placeInitiale = false;
+  $effect(() => {
+    const p = passageSel != null ? passages[passageSel] : undefined;
+    if (!placeInitiale && p) {
+      placeInitiale = true;
+      selection = p.debutNote;
+    }
+  });
   let courant = $state<number | null>(null);
-  let passageSel = $state<number | null>(null);
+  let passageSel = $state<number | null>(passageInitial != null && Number.isFinite(passageInitial) ? passageInitial : null);
   let joue = $state(false);
   let temps = $state<string>('');
 
@@ -233,7 +243,7 @@
     couperSuite();
     if (joue) {
       const minutes = (Date.now() - debutLecture) / 60000;
-      if (minutes >= 0.25) {
+      if (minutes >= 0.25 && !seance.active) {
         jourDe(stockage.etat, Date.now()).minutes += Math.round(minutes * 10) / 10;
         stockage.modifie();
       }

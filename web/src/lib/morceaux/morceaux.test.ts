@@ -112,3 +112,9 @@ describe('cohérence des doigtés fournis', () => {
     gluck.notes.forEach((n, i) => expect(CORDES[fournis[i]!.corde]!.midi + fournis[i]!.demiTons).toBe(n.midi));
   });
 });
+
+describe('passages sans notes', () => {
+  it('chaque passage contient au moins une note', () => {
+    for (const p of [gluck, faure]) for (const x of decouper(p.mesures, p.notes)) expect(x.finNote).toBeGreaterThan(x.debutNote);
+  });
+});

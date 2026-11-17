@@ -25,12 +25,21 @@ export function decouper(mesures: MesureMorceau[], notes: NoteMorceau[], coupure
   if (!debuts.length) for (let m = 1; m <= total; m += taille) debuts.push(m);
   // Une dernière tranche trop courte rejoint la précédente.
   if (!coupures?.length && debuts.length > 1 && total - debuts[debuts.length - 1]! + 1 < Math.ceil(taille / 2)) debuts = debuts.slice(0, -1);
-  return debuts.map((de, k) => {
+  const bruts = debuts.map((de, k) => {
     const a = (debuts[k + 1] ?? total + 1) - 1;
     const debutNote = notes.findIndex((x) => x.mesure >= de);
     const apres = notes.findIndex((x) => x.mesure > a);
     return { n: k, de, a, debutNote: debutNote < 0 ? notes.length : debutNote, finNote: apres < 0 ? notes.length : apres };
   });
+  // Un passage sans aucune note (silences seuls) rejoint le précédent, ou le suivant au début.
+  const out: Passage[] = [];
+  for (const p of bruts) {
+    const prec = out[out.length - 1];
+    if (p.debutNote === p.finNote && prec) prec.a = p.a;
+    else if (prec && prec.debutNote === prec.finNote) out[out.length - 1] = { ...p, de: prec.de };
+    else out.push({ ...p });
+  }
+  return out.map((p, n) => ({ ...p, n }));
 }
 
 export interface Competence {

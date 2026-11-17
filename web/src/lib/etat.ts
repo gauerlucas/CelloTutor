@@ -39,7 +39,7 @@ export interface Seance {
   dureePrevueMin: number;
   dureeReelleMin: number;
   energie: 'fatigue' | 'normal' | 'forme';
-  blocs: { id: string; titre: string; minutes: number; fait: boolean }[];
+  blocs: { id: string; titre: string; minutes: number; fait: boolean; cible?: string; type?: string }[];
   ressenti?: 1 | 2 | 3;
 }
 

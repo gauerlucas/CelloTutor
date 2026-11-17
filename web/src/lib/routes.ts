@@ -3,8 +3,6 @@
 export interface Route {
   id: string;
   titre: string;
-  /** Étape du plan où la section arrive (affichée tant qu'elle n'est pas faite). */
-  etape?: string;
   resume: string;
   /**
    * Largeur de la page. « pleine » (par défaut) occupe tout l'écran : au pupitre, on veut
@@ -18,10 +16,10 @@ export const ROUTES: Route[] = [
   { id: 'aujourdhui', titre: "Aujourd'hui", resume: 'La séance du jour, construite selon ton temps et ton énergie.', largeur: 'etroite' },
   { id: 'positions', titre: 'Positions', resume: 'Cartographie du manche de la ½ à la 7ᵉ position, nom des notes sous les doigts, démanchés.' },
   { id: 'morceaux', titre: 'Morceaux', resume: 'Bibliothèque, morceaux-objectifs, lecteur avec partition, son, boucle et manche synchronisé.' },
-  { id: 'lecture', titre: 'Lecture', etape: 'J4', resume: 'Lire vite en clé de fa, puis d’ut et de sol, par repères et par écarts.' },
-  { id: 'gammes', titre: 'Gammes', etape: 'J4', resume: 'Gammes et arpèges sur bourdon, avec la justesse mesurée au micro.' },
-  { id: 'oreille', titre: 'Oreille', etape: 'J4', resume: 'Cordes à vide, justesse en cents, imaginer la note avant de la jouer.' },
-  { id: 'progression', titre: 'Progression', etape: 'J3', resume: 'Journal des séances, ceintures de maîtrise, records et courbes.' },
+  { id: 'lecture', titre: 'Lecture', resume: 'Lire vite en clé de fa, puis d’ut et de sol, par repères et par écarts.' },
+  { id: 'gammes', titre: 'Gammes', resume: 'Gammes et arpèges sur bourdon, avec la justesse mesurée au micro.' },
+  { id: 'oreille', titre: 'Oreille', resume: 'Cordes à vide, justesse en cents, imaginer la note avant de la jouer.' },
+  { id: 'progression', titre: 'Progression', resume: 'Journal des séances, ceintures de maîtrise, records et courbes.' },
   { id: 'reglages', titre: 'Réglages', resume: 'Affichage, son, sauvegarde.', largeur: 'etroite' },
 ];
 
@@ -47,4 +45,9 @@ export function paramsPositions(p: string[]): { modeInitial?: ModePositions; pos
     return { modeInitial: mode, trajetInitial: t?.length === 2 ? [t[0]!, t[1]!] : null };
   }
   return p[1] ? { modeInitial: mode, posInitiale: p[1] } : { modeInitial: mode };
+}
+
+/** Premier paramètre de l'adresse s'il fait partie des valeurs permises, sinon la valeur par défaut. */
+export function modeDe<const T extends string>(p: string | undefined, permis: readonly T[], defaut: NoInfer<T>): T {
+  return permis.find((m) => m === p) ?? defaut;
 }

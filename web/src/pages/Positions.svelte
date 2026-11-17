@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { untrack } from 'svelte';
   import Manche, { type Marque } from '../components/Manche.svelte';
   import Portee, { type NotePortee } from '../components/Portee.svelte';
   import ChoixNote from '../components/ChoixNote.svelte';
@@ -159,18 +160,20 @@
   // ------------------------------------------------------------- changements de mode / position
   $effect(() => {
     void mode; void posId; void alterations; void trajet;
-    score = { justes: 0, total: 0, serie: 0, ms: [] };
-    messageRecord = '';
-    selection = null;
-    infoCase = '';
-    if (mode === 'nom' || mode === 'trouve') {
-      file = nouvelleFile(5);
-      suivant();
-    }
-    if (mode === 'demanche') {
-      fileDem = nouvelleFile(4);
-      nouveauDemanche();
-    }
+    untrack(() => {
+      score = { justes: 0, total: 0, serie: 0, ms: [] };
+      messageRecord = '';
+      selection = null;
+      infoCase = '';
+      if (mode === 'nom' || mode === 'trouve') {
+        file = nouvelleFile(5);
+        suivant();
+      }
+      if (mode === 'demanche') {
+        fileDem = nouvelleFile(4);
+        nouveauDemanche();
+      }
+    });
   });
 
   const marques = $derived.by<Marque[]>(() => {
