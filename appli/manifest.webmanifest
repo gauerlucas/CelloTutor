@@ -1,0 +1,14 @@
+{
+  "name": "CelloTutor",
+  "short_name": "CelloTutor",
+  "description": "Travail du violoncelle : positions, lecture, gammes, morceaux.",
+  "lang": "fr",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f5f7f4",
+  "theme_color": "#2b4a7d",
+  "icons": [
+    { "src": "icone.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+  ]
+}
