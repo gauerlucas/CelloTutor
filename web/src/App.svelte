@@ -35,7 +35,7 @@
   </div>
 </header>
 
-<main class="contenu">
+<main class="contenu" class:etroite={route.largeur === 'etroite'}>
   {#if route.id === 'aujourdhui'}
     <Aujourdhui />
   {:else if route.id === 'reglages'}
@@ -47,11 +47,12 @@
 
 <style>
   .haut { position: sticky; top: 0; z-index: 5; background: var(--paper); border-bottom: 1px solid var(--rule); }
-  .haut-in { max-width: 1040px; margin: 0 auto; padding: .5rem 16px 0; display: flex; flex-wrap: wrap; align-items: center; gap: .2rem 1.2rem; }
+  .haut-in { padding: .5rem clamp(16px, 2.5vw, 40px) 0; display: flex; flex-wrap: wrap; align-items: center; gap: .2rem 1.2rem; }
   .marque { font-family: var(--f-display); font-weight: 700; font-size: 1.35rem; color: var(--ink); text-decoration: none; padding-bottom: .5rem; }
   nav { display: flex; gap: 2px; overflow-x: auto; flex: 1 1 auto; min-width: 0; }
   nav a { font-weight: 700; font-size: .95rem; padding: .55rem .6rem; color: var(--ink-soft); text-decoration: none; border-bottom: 3px solid transparent; white-space: nowrap; }
   nav a:hover { color: var(--ink); }
   nav a[aria-current='page'] { color: var(--ink); border-bottom-color: var(--accent); }
-  .contenu { max-width: 1040px; margin: 0 auto; padding: 1.5rem 16px 4rem; }
+  .contenu { padding: 1.5rem clamp(16px, 2.5vw, 40px) 4rem; }
+  .contenu.etroite { max-width: calc(1040px + 2 * clamp(16px, 2.5vw, 40px)); margin: 0 auto; }
 </style>
