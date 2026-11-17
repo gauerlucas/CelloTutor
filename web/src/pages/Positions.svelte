@@ -16,7 +16,7 @@
   import { apresReponse, choisir, enregistrerReponse, maitrise, nouvelleFile, proposerRecord } from '../lib/revision';
 
   type Mode = 'explorer' | 'nom' | 'trouve' | 'demanche';
-  let { modeInitial = 'explorer', posInitiale = '1' }: { modeInitial?: Mode; posInitiale?: string } = $props();
+  let { modeInitial = 'explorer', posInitiale = '1', trajetInitial = null }: { modeInitial?: Mode; posInitiale?: string; trajetInitial?: [string, string] | null } = $props();
 
   let mode = $state<Mode>(modeInitial);
   let posId = $state(posInitiale);
@@ -109,7 +109,7 @@
   }
 
   // ------------------------------------------------------------- démanchés
-  let trajet = $state<[string, string] | null>(null);
+  let trajet = $state<[string, string] | null>(trajetInitial);
   let dem = $state<Demanche | null>(null);
   let fileDem = nouvelleFile(4);
   let verdict = $state<'juste' | 'haut' | 'bas' | null>(null);

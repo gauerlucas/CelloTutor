@@ -1,18 +1,23 @@
 <script lang="ts">
   import { onMount } from 'svelte';
-  import { ROUTES, routeDepuisHash } from './lib/routes';
+  import { ROUTES, parametresDepuisHash, paramsPositions, routeDepuisHash } from './lib/routes';
   import { stockage } from './lib/stockage.svelte';
   import { appliquerAffichage } from './lib/theme';
   import Aujourdhui from './pages/Aujourdhui.svelte';
   import Reglages from './pages/Reglages.svelte';
   import AVenir from './pages/AVenir.svelte';
   import Positions from './pages/Positions.svelte';
+  import Morceaux from './pages/Morceaux.svelte';
   import StatutSauvegarde from './pages/StatutSauvegarde.svelte';
 
   let route = $state(routeDepuisHash(location.hash));
+  let params = $state(parametresDepuisHash(location.hash));
 
   onMount(() => {
-    const surHash = () => (route = routeDepuisHash(location.hash));
+    const surHash = () => {
+      route = routeDepuisHash(location.hash);
+      params = parametresDepuisHash(location.hash);
+    };
     addEventListener('hashchange', surHash);
     void stockage.charger();
     return () => removeEventListener('hashchange', surHash);
@@ -42,7 +47,11 @@
   {:else if route.id === 'reglages'}
     <Reglages />
   {:else if route.id === 'positions'}
-    <Positions />
+    {#key params.join('/')}
+      <Positions {...paramsPositions(params)} />
+    {/key}
+  {:else if route.id === 'morceaux'}
+    <Morceaux id={params[0] ?? null} />
   {:else}
     <AVenir {route} />
   {/if}

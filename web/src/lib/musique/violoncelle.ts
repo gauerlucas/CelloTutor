@@ -45,7 +45,18 @@ export const POSITIONS: Position[] = [
   { id: 'pouce', label: 'position du pouce', court: 'P', ff: 12, doigts: { p: 0, '1': 2, '2': 3, '3': 5 }, pouce: true },
 ];
 
-export const position = (id: string) => POSITIONS.find((p) => p.id === id);
+/** Position du pouce posé à `ff` demi-tons du sillet (P12 = sur l'octave, P14, P15…). */
+export const positionPouce = (ff: number): Position => ({
+  id: `P${ff}`, label: 'position du pouce', court: 'P', ff, doigts: { p: 0, '1': 2, '2': 3, '3': 5 }, pouce: true,
+});
+
+/** Retrouve une position par son identifiant ; « P14 » donne une position du pouce sur mesure. */
+export function position(id: string): Position | undefined {
+  const p = POSITIONS.find((x) => x.id === id);
+  if (p) return p;
+  const m = /^P(\d{1,2})$/.exec(id);
+  return m ? positionPouce(Number(m[1])) : undefined;
+}
 
 /** « 4e position — mi sur la corde de La » */
 export function libellePosition(p: Position, style: StyleNoms = 'latin'): string {

@@ -256,6 +256,7 @@ def gluck() -> None:
         par_mesure.setdefault(n["b"], []).append(n)
     mesures: list[Mesure] = []
     doigtes = []  # un par note jouée (attaque), dans l'ordre de la partition
+    prec = None  # note précédente de l'ébauche, pour repérer les prolongations d'une mesure à l'autre
     for b in sorted(par_mesure):
         m = Mesure(numero=b - 1)  # l'ébauche commençait à 2 ; la partition imprimée à 1
         t = F(0)
@@ -283,7 +284,9 @@ def gluck() -> None:
                     premiere = False
                 m.evts.append(e)
             t += du
-            doigtes.append({"mesure": b - 1, "corde": n["si"], "position": n["p"], "doigt": n["f"], "demiTons": n["sm"]})
+            if not (prec and prec.get("tie") and prec["m"] == n["m"]):  # une prolongation n'est pas une attaque
+                doigtes.append({"mesure": b - 1, "corde": n["si"], "position": n["p"], "doigt": n["f"], "demiTons": n["sm"]})
+            prec = n
         if t < 3:
             for v in decouper(F(3) - t):
                 m.evts.append(Evt(duree=v))

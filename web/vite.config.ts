@@ -6,6 +6,8 @@ import { viteSingleFile } from 'vite-plugin-singlefile';
 // pour pouvoir être servie par l'assistant local ou ouverte directement depuis un dossier.
 export default defineConfig({
   plugins: [svelte(), viteSingleFile()],
+  // Les partitions fournies vivent dans ../contenu, hors du dossier web.
+  server: { fs: { allow: ['..'] } },
   build: {
     outDir: '../appli',
     emptyOutDir: true,

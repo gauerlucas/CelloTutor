@@ -25,6 +25,7 @@
     interactif = false,
     oncase,
     titre = "Manche du violoncelle vu par le musicien : sillet en bas, corde de La à gauche",
+    hauteur = null,
   }: {
     marques?: Marque[];
     cadre?: string | null;
@@ -36,6 +37,8 @@
     interactif?: boolean;
     oncase?: (corde: number, demiTons: number) => void;
     titre?: string;
+    /** Hauteur CSS imposée (par défaut : presque toute la hauteur de l'écran). */
+    hauteur?: string | null;
   } = $props();
 
   const W = 320, H = 600, SILLET = 574, HAUT = 72, MAX = 19, CX = 160, CHEVALET = 30;
@@ -97,7 +100,7 @@
   });
 </script>
 
-<svg class="manche" viewBox={`0 0 ${W} ${H}`} role="img" aria-label={titre}>
+<svg class="manche" viewBox={`0 0 ${W} ${H}`} role="img" aria-label={titre} style={hauteur ? `height:${hauteur}` : undefined}>
   <path class="touche" d={`M${xBord(-1, SILLET)} ${SILLET} L${xBord(-1, yHaut)} ${yHaut} L${xBord(1, yHaut)} ${yHaut} L${xBord(1, SILLET)} ${SILLET} Z`} />
   <rect class="sillet" x={xBord(-1, SILLET) - 3} y={SILLET - 2} width={xBord(1, SILLET) - xBord(-1, SILLET) + 6} height="7" rx="2" />
   <path class="caisse" d={`M${xBord(-1, yCaisse) + 2} ${yCaisse - 5} Q${CX} ${yCaisse + 9} ${xBord(1, yCaisse) - 2} ${yCaisse - 5}`} />
@@ -111,7 +114,7 @@
     <line class="rep" x1={xBord(-1, yDemi(p.ff)) - 12} x2={xBord(-1, yDemi(p.ff)) - 2} y1={yDemi(p.ff)} y2={yDemi(p.ff)} />
     <text class={`rep-lab ${cadre === p.id ? 'on' : ''}`} x={xBord(-1, yDemi(p.ff)) - 16} y={yDemi(p.ff) + 4} text-anchor="end">{p.court}</text>
   {/each}
-  <text class={`rep-lab ${cadre === 'pouce' ? 'on' : ''}`} x={xBord(1, yDemi(12)) + 16} y={yDemi(12) + 4}>P</text>
+  <text class={`rep-lab ${pos?.pouce ? 'on' : ''}`} x={xBord(1, yDemi(12)) + 16} y={yDemi(12) + 4}>P</text>
   {#if forme}<path class="cadre" d={forme} />{/if}
   {#each CORDES as c (c.i)}
     <line class="corde" x1={xCorde(c.i, SILLET + 4)} x2={xCorde(c.i, 48)} y1={SILLET + 4} y2="48" stroke-width={EPAISSEUR[c.i]} />

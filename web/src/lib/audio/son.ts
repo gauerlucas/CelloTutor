@@ -7,6 +7,7 @@ import { hzDeMidi } from '../musique/notes';
 let AC: AudioContext | null = null;
 let MASTER: GainNode | null = null;
 let BUS: GainNode | null = null;
+let SUITE: GainNode | null = null;
 let BRUIT: AudioBuffer | null = null;
 let volume = 0.6;
 
@@ -104,6 +105,8 @@ export interface OptionsNote {
   dans?: number;
   force?: number; // 0 → 1
   vibrato?: boolean;
+  /** Note d'une suite (lecteur de morceau) : coupée d'un coup par couperSuite(). */
+  suite?: boolean;
 }
 
 /** Joue une note de violoncelle. Renvoie l'heure audio de fin. */
@@ -116,7 +119,7 @@ export function jouer(m: number, duree = 1.2, o: OptionsNote = {}): number {
   const fin = t + duree;
   try {
     const sortie = c.createGain();
-    sortie.connect(BUS!);
+    sortie.connect(o.suite ? busSuite() : BUS!);
     const vib = c.createOscillator();
     vib.frequency.value = 5 + Math.random() * 0.7;
     const vg = c.createGain();
@@ -192,6 +195,26 @@ export function jouer(m: number, duree = 1.2, o: OptionsNote = {}): number {
   }
   return fin;
 }
+
+function busSuite(): GainNode {
+  if (!SUITE) {
+    SUITE = contexteAudio().createGain();
+    SUITE.connect(BUS!);
+  }
+  return SUITE;
+}
+
+/** Arrête net toutes les notes d'une suite en cours (y compris celles déjà programmées). */
+export function couperSuite(): void {
+  if (!SUITE || !AC) return;
+  const s = SUITE;
+  SUITE = null;
+  s.gain.setTargetAtTime(0, AC.currentTime, 0.03);
+  setTimeout(() => s.disconnect(), 400);
+}
+
+/** Heure de l'horloge audio (secondes). */
+export const maintenantAudio = () => contexteAudio().currentTime;
 
 /** Clic de métronome. */
 export function clic(dans = 0, accent = false): void {
