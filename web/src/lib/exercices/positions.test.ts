@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { demanchesDe, gammeDePosition, itemsPosition, jugerArrivee, tousLesDemanches } from './positions';
+import { aideCase, demanchesDe, gammeDePosition, itemsPosition, jugerArrivee, tousLesDemanches } from './positions';
 import { nomNote } from '../musique/notes';
 import { casesPour, libellePosition, position } from '../musique/violoncelle';
 
@@ -56,5 +56,28 @@ describe('démanchés', () => {
     expect(jugerArrivee(64.2, 64)).toBe('juste');
     expect(jugerArrivee(64.4, 64)).toBe('haut');
     expect(jugerArrivee(63.6, 64)).toBe('bas');
+  });
+});
+
+describe('aide : logique des positions', () => {
+  it('3e position, corde de Ré : on récite Ré Mi Fa Sol, le doigt 3 est deux cases plus loin (La)', () => {
+    const a = aideCase(position('3')!, 2, 7);
+    expect(a.recit.map((n) => n.L)).toEqual([1, 2, 3, 4]);
+    expect(a.repere).toMatchObject({ L: 4, acc: 0 });
+    expect(a.correction).toBe(0);
+    expect(a.chemin.map((c) => c.doigt)).toEqual(['1', '2', '3']);
+    expect(a.chemin[2]!.note).toMatchObject({ L: 5, acc: 0 });
+  });
+  it('2e position, corde de Sol : la note récitée (Si) est un demi-ton trop haut → si♭', () => {
+    const a = aideCase(position('2')!, 1, 3);
+    expect(a.recit[a.recit.length - 1]).toMatchObject({ L: 6, acc: 0 });
+    expect(a.correction).toBe(-1);
+    expect(a.repere).toMatchObject({ L: 6, acc: -1 });
+  });
+  it('l’échelle va du sillet au-delà du 4e doigt', () => {
+    const a = aideCase(position('1')!, 3, 4);
+    expect(a.echelle[0]!.demiTons).toBe(0);
+    expect(a.echelle.find((c) => c.doigt === '4')!.demiTons).toBe(5);
+    expect(a.echelle.length).toBe(7);
   });
 });
