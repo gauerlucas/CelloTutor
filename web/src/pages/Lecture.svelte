@@ -213,7 +213,7 @@
   }
   /** Indices de repères en filigrane : pleins pour une note nouvelle, ils pâlissent puis disparaissent avec la maîtrise. */
   const OPACITE_PAR_BOITE = [0.85, 0.5, 0.22, 0, 0, 0];
-  const opaciteDe = (cle: string) => OPACITE_PAR_BOITE[stockage.etat.items[cle]?.boite ?? 0] ?? 0;
+  const opaciteDe = (cle: string) => (rl.reperes ? (OPACITE_PAR_BOITE[stockage.etat.items[cle]?.boite ?? 0] ?? 0) : 0);
 
   // ------------------------------------------------------------- placer (exercice inverse)
   let cibleP = $state<ItemLecture | null>(null);
@@ -463,6 +463,7 @@
           <button class="puce" aria-pressed={rl.image} onclick={() => reglerRetour('image', !rl.image)}>{palais[0]?.image} Image</button>
           <button class="puce" aria-pressed={rl.mot} onclick={() => reglerRetour('mot', !rl.mot)}>Mot</button>
           <button class="puce" aria-pressed={rl.manche} onclick={() => reglerRetour('manche', !rl.manche)}>Manche</button>
+          <button class="puce" aria-pressed={rl.reperes} onclick={() => reglerRetour('reperes', !rl.reperes)} title="Lignes des cordes à vide en couleur sur la portée (elles pâlissent d’elles-mêmes quand tu connais la note)">Repères</button>
         </div>
       </div>
       <button class="btn discret-btn" onclick={() => sonsNote((mode === 'placer' ? cibleP?.note : courant?.note) ?? deDegre(18), 0, 0.9)}>▶ Essayer</button>

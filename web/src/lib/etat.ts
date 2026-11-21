@@ -34,8 +34,12 @@ export interface RetourLecture {
   image: boolean;
   mot: boolean;
   manche: boolean;
+  /** Aides de la portée : lignes des cordes à vide en couleur et leurs noms. */
+  reperes: boolean;
+  /** Oreille absolue : montrer la couleur de la note avant la réponse (indice). */
+  indiceCouleur: boolean;
 }
-export const RETOUR_LECTURE_DEFAUT: RetourLecture = { violoncelle: true, ordre: 'violon-nom', image: true, mot: true, manche: true };
+export const RETOUR_LECTURE_DEFAUT: RetourLecture = { violoncelle: true, ordre: 'violon-nom', image: true, mot: true, manche: true, reperes: true, indiceCouleur: false };
 
 export interface ImageNote {
   image: string;
@@ -193,6 +197,8 @@ export function normaliser(brut: unknown): Etat | null {
     image: typeof rl.image === 'boolean' ? rl.image : RETOUR_LECTURE_DEFAUT.image,
     mot: typeof rl.mot === 'boolean' ? rl.mot : RETOUR_LECTURE_DEFAUT.mot,
     manche: typeof rl.manche === 'boolean' ? rl.manche : RETOUR_LECTURE_DEFAUT.manche,
+    reperes: typeof rl.reperes === 'boolean' ? rl.reperes : RETOUR_LECTURE_DEFAUT.reperes,
+    indiceCouleur: typeof rl.indiceCouleur === 'boolean' ? rl.indiceCouleur : RETOUR_LECTURE_DEFAUT.indiceCouleur,
   };
   if (reglages.timbre === 'echantillons' || reglages.timbre === 'synthese') r.timbre = reglages.timbre;
   if (typeof reglages.dureeParDefaut === 'number' && reglages.dureeParDefaut >= 5 && reglages.dureeParDefaut <= 240) r.dureeParDefaut = reglages.dureeParDefaut;

@@ -74,7 +74,7 @@
   {:else if route.id === 'lecture'}
     {#key params.join('/')}<Lecture modeInitial={modeDe(params[0], ['nommer', 'suite', 'morceaux', 'revisions'], 'nommer')} />{/key}
   {:else if route.id === 'oreille'}
-    {#key params.join('/')}<Oreille modeInitial={modeDe(params[0], ['cordes', 'justesse', 'imagine'], 'cordes')} />{/key}
+    {#key params.join('/')}<Oreille modeInitial={modeDe(params[0], ['cordes', 'justesse', 'absolue', 'imagine'], 'cordes')} />{/key}
   {:else if route.id === 'gammes'}
     {#key params.join('/')}<Gammes idInitial={params[0] ?? null} />{/key}
   {:else if route.id === 'progression'}
