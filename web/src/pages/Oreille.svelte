@@ -8,6 +8,7 @@
   import BoutonMicro from '../components/BoutonMicro.svelte';
   import Portee from '../components/Portee.svelte';
   import ChoixNote from '../components/ChoixNote.svelte';
+  import OreilleAbsolue from '../components/OreilleAbsolue.svelte';
   import { micro } from '../lib/audio/micro.svelte';
   import { jouer, demarrerBourdon, arreterBourdon } from '../lib/audio/son';
   import { stockage } from '../lib/stockage.svelte';
@@ -16,7 +17,7 @@
   import { deMidi, nomNote } from '../lib/musique/notes';
   import { enregistrerReponse } from '../lib/revision';
 
-  type Mode = 'cordes' | 'justesse' | 'imagine';
+  type Mode = 'cordes' | 'justesse' | 'imagine' | 'absolue';
   let { modeInitial = 'cordes' }: { modeInitial?: Mode } = $props();
   let mode = $state<Mode>(modeInitial);
   const style = $derived(stockage.etat.reglages.nomsNotes);
@@ -24,6 +25,7 @@
   const MODES: { id: Mode; t: string; aide: string }[] = [
     { id: 'cordes', t: 'Cordes à vide', aide: 'Accorde-toi : joue une corde à vide, l’aiguille montre l’écart en cents. Touche une corde pour entendre la référence.' },
     { id: 'justesse', t: 'Justesse', aide: 'Une note est proposée : écoute-la, joue-la, et tiens-la jusqu’à ce que l’aiguille reste dans la zone verte une seconde.' },
+    { id: 'absolue', t: 'Oreille absolue', aide: 'Une note sonne, sans repère : touche sa place sur la portée. Chaque note a sa couleur, son image et son nom chanté, pour que le son finisse par évoquer le nom tout seul. On commence avec do et sol.' },
     { id: 'imagine', t: 'Imagine la note', aide: 'Lis la note, entends-la dans ta tête (chante-la intérieurement), puis vérifie. Sans instrument.' },
   ];
 
@@ -119,7 +121,7 @@
       <button aria-pressed={mode === m.id} onclick={() => (mode = m.id)}>{m.t}</button>
     {/each}
   </div>
-  {#if mode !== 'imagine'}<BoutonMicro />{/if}
+  {#if mode === 'cordes' || mode === 'justesse'}<BoutonMicro />{/if}
 </div>
 <p class="aide">{MODES.find((m) => m.id === mode)?.aide}</p>
 
@@ -165,6 +167,8 @@
       <p class="stats">Notes tenues justes : <b>{compte.faites}</b></p>
     </section>
   </div>
+{:else if mode === 'absolue'}
+  <OreilleAbsolue />
 {:else}
   <section class="carte colonne imagine">
     {#if imagine != null}
