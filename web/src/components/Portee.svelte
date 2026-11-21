@@ -12,6 +12,11 @@
     petite?: boolean;
     /** Apparition retardée (ms), pour dérouler un chemin note à note. */
     delai?: number;
+    /** La tête de note se change en ce nom, écrit à sa place exacte sur la portée. */
+    morph?: string;
+    petitMorph?: boolean;
+    /** Moment du changement en nom (ms), si différent de l'apparition. */
+    delaiMorph?: number;
   }
 </script>
 
@@ -28,6 +33,7 @@
     largeurMin = 0,
     hauteur = 168,
     titre,
+    nomCle = true,
     onnote,
   }: {
     notes?: (NotePortee | null)[];
@@ -38,6 +44,7 @@
     largeurMin?: number;
     hauteur?: number;
     titre?: string;
+    nomCle?: boolean;
     onnote?: (i: number) => void;
   } = $props();
 
@@ -66,7 +73,7 @@
     <line class={`ligne ${corde ? 'repere c-' + corde : ''}`} x1="4" x2={L - 6} y1={bas - i * s} y2={bas - i * s} />
     {#if corde}<text class={`lab c-${corde}`} x="6" y={bas - i * s - 3}>{NOM_CORDE[corde]}</text>{/if}
   {/each}
-  <text class="nom-cle" x={L - 8} y="12" text-anchor="end">{CLES[cle].label}</text>
+ {#if nomCle}<text class="nom-cle" x={L - 8} y="12" text-anchor="end">{CLES[cle].label}</text>{/if}
   {#if cle === 'fa'}
     <circle class="plein" cx="38" cy={bas - 42} r="6" />
     <path class="cle" d={`M35 ${bas - 45} C38 ${bas - 61} 69 ${bas - 62} 70 ${bas - 41} C71 ${bas - 19} 54 ${bas - 4} 30 ${bas + 8}`} />
@@ -92,8 +99,12 @@
         {@const corde = aides ? CORDE_PAR_DEGRE[k] : undefined}
         <line class={`ligne ${corde ? 'repere c-' + corde : ''}`} x1={cx - 14} x2={cx + 14} y1={y(k)} y2={y(k)} />
       {/each}
-      {#if it.n.acc}<text class={`alt ${it.etat ?? ''}`} x={cx - 13} y={cy + 7} text-anchor="end">{symboleAlteration(it.n.acc)}</text>{/if}
-      <ellipse class={`tete ${it.etat ?? ''}`} {cx} {cy} rx={it.petite ? 6.4 : 8.6} ry={it.petite ? 4.6 : 6.2} transform={`rotate(-22 ${cx} ${cy})`} />
+      {#if it.n.acc}<text class={`alt ${it.etat ?? ''} ${it.morph ? 'morphe' : ''}`} style={it.morph ? `animation-delay:${(it.delaiMorph ?? it.delai ?? 0) + 220}ms` : ''} x={cx - 13} y={cy + 7} text-anchor="end">{symboleAlteration(it.n.acc)}</text>{/if}
+      <ellipse class={`tete ${it.etat ?? ''} ${it.morph ? 'morphe' : ''}`} style={it.morph ? `animation-delay:${(it.delaiMorph ?? it.delai ?? 0) + 220}ms` : ''} {cx} {cy} rx={it.petite ? 6.4 : 8.6} ry={it.petite ? 4.6 : 6.2} transform={`rotate(-22 ${cx} ${cy})`} />
+      {#if it.morph}
+        <text class={`morph ${it.petitMorph ? 'petit' : ''}`} x={cx} y={cy} text-anchor="middle" dominant-baseline="central"
+          style={`fill:var(--n${it.n.L});animation-delay:${(it.delaiMorph ?? it.delai ?? 0) + 220}ms`}>{it.morph}</text>
+      {/if}
       {#if it.nom}
         <text class={`nom ${it.etat ?? ''} ${it.petite ? 'petit' : ''}`} x={cx + (it.petite ? 9 : 12)} y={cy - (it.petite ? 7 : 9)}>{it.nom}</text>
       {/if}
@@ -134,6 +145,13 @@
   .nom.faux, .nom.ok { font-size: 22px; }
   .nom.faux { fill: var(--bad); } .nom.ok { fill: var(--good); }
   .nom.rep-do { fill: var(--s-do); } .nom.rep-sol { fill: var(--s-sol); } .nom.rep-re { fill: var(--s-re); } .nom.rep-la { fill: var(--s-la); } .nom.rep-autre { fill: var(--accent); }
+  .tete.morphe, .alt.morphe { animation: fond .35s ease-in forwards; }
+  @keyframes fond { to { opacity: .13; } }
+  .morph { font: 800 26px var(--f-body); paint-order: stroke; stroke: var(--surface); stroke-width: 5px; opacity: 0;
+    transform-box: fill-box; transform-origin: center; animation: morph .38s cubic-bezier(.2, 1.4, .5, 1) forwards; }
+  .morph.petit { font-size: 17px; font-weight: 700; stroke-width: 4px; }
+  @keyframes morph { from { opacity: 0; transform: scale(.25); } to { opacity: 1; transform: scale(1); } }
+  @media (prefers-reduced-motion: reduce) { .morph { animation: none; opacity: 1; } .tete.morphe { animation: none; opacity: .13; } }
   .apparait { opacity: 0; animation: apparait .25s ease-out forwards; }
   @keyframes apparait { from { opacity: 0; transform: translateY(3px); } to { opacity: 1; transform: none; } }
   @media (prefers-reduced-motion: reduce) { .apparait { animation: none; opacity: 1; } }

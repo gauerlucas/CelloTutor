@@ -103,7 +103,7 @@
     retour = { juste, nom: nomNote(n, style), place: placeSurPortee(n, courant.clef), chemin, choisi: L };
     if (juste) {
       jouer(midi(n), 0.9);
-      setTimeout(() => { if (retour?.juste) suivant(); }, 750);
+      setTimeout(() => { if (retour?.juste) suivant(); }, 1000);
     } else {
       // On entend le chemin, du repère à la note, puis la note tenue.
       chemin.forEach((d, k) => {
@@ -124,7 +124,7 @@
       return slots;
     }
     if (retour.juste) {
-      slots[SLOT_QUESTION] = { n: courant.note, etat: 'ok', nom: retour.nom };
+      slots[SLOT_QUESTION] = { n: courant.note, etat: 'ok', morph: retour.nom, delai: -120 };
       return slots;
     }
     const ch = retour.chemin;
@@ -137,9 +137,11 @@
       slots[fin - (ch.length - 1) + k] = {
         n,
         etat: derniere ? 'faux' : premiere ? couleurRepere(d) : 'pas',
-        nom: derniere ? retour!.nom : premiere ? nomD(d) : nomD(d).toLowerCase(),
+        morph: derniere ? retour!.nom : premiere ? nomD(d) : nomD(d).toLowerCase(),
+        petitMorph: !derniere && !premiere,
         petite: !derniere && !premiere,
-        delai: derniere && ch.length === 1 ? undefined : k * PAS_MS,
+        delai: derniere ? undefined : k * PAS_MS,
+        delaiMorph: k * PAS_MS,
       };
     });
     return slots;
@@ -253,14 +255,14 @@
       {/if}
     {:else if courant}
       <div class="portee-grande seule">
-        <Portee notes={notePortee} cle={courant.clef} aides={!!retour && !retour.juste} espacement={64} hauteur={164} />
+        <Portee notes={notePortee} cle={courant.clef} nomCle={false} espacement={64} hauteur={164} />
       </div>
       {#if mode === 'revisions'}<p class="discret">{CLES[courant.clef].label}</p>{/if}
       <div class={`retour ${retour ? (retour.juste ? 'r-ok' : 'r-faux') : ''}`} aria-live="polite">
         {#if retour?.juste}
-          <p class="grand bien">Oui : {retour.nom}</p>
+          <p class="grand bien">Oui : <span class="nom-note" style={`color:var(--n${courant.note.L})`}>{retour.nom}</span></p>
         {:else if retour}
-          <p class="grand mal">C’est {retour.nom} <span class="place">({retour.place})</span></p>
+          <p class="grand mal">C’est <span class="nom-note" style={`color:var(--n${courant.note.L})`}>{retour.nom}</span> <span class="place">({retour.place})</span></p>
           <p class="chemin">{texteChemin}</p>
         {:else}
           <p class="discret">Quelle est cette note ?</p>
@@ -309,6 +311,7 @@
   .retour.r-ok { background: var(--good-bg); }
   .retour.r-faux { background: color-mix(in srgb, var(--bad) 13%, var(--surface)); }
   .grand { font-size: 1.5rem; font-family: var(--f-display); }
+  .nom-note { font-weight: 800; }
   .place { font-size: 1rem; font-family: var(--f-body); font-weight: 500; }
   .chemin { font-size: 1.05rem; color: var(--ink); }
   .consigne { margin: 0; width: 100%; max-width: none; text-align: center; color: var(--ink-soft); }
