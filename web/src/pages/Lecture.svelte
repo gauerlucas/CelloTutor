@@ -4,6 +4,10 @@
   import { untrack } from 'svelte';
   import Portee, { type NotePortee } from '../components/Portee.svelte';
   import ChoixNote from '../components/ChoixNote.svelte';
+  import Manche, { type Marque } from '../components/Manche.svelte';
+  import { doigterAuto, demiTonsDe, courtPosition } from '../lib/morceaux/doigte';
+  import { CORDES } from '../lib/musique/violoncelle';
+  import { direNote } from '../lib/audio/voix';
   import { stockage } from '../lib/stockage.svelte';
   import { jouer } from '../lib/audio/son';
   import { CLES, CORDE_DU_DEGRE, cheminDepuisRepere, placeSurPortee, type Cle } from '../lib/musique/cles';
@@ -15,7 +19,7 @@
   import { ficheMorceau } from '../lib/morceaux';
   import { analyserMorceau } from '../lib/morceaux/analyse';
 
-  type Mode = 'nommer' | 'suite' | 'morceaux' | 'revisions';
+  type Mode = 'nommer' | 'placer' | 'suite' | 'morceaux' | 'revisions';
   let { modeInitial = 'nommer' }: { modeInitial?: Mode } = $props();
 
   let mode = $state<Mode>(modeInitial);
@@ -27,6 +31,7 @@
   const ouvertes = $derived(etapesOuvertes(stockage.etat, clef));
   const MODES: { id: Mode; t: string; aide: string }[] = [
     { id: 'nommer', t: 'Nommer', aide: 'Une note sur la portée : donne son nom. Touches 1 à 7 pour répondre vite. Une erreur revient deux ou trois notes plus tard.' },
+    { id: 'placer', t: 'Placer', aide: 'Un nom de note : touche sa place sur la portée, ligne ou interligne. Produire la place grave la note mieux que la reconnaître.' },
     { id: 'suite', t: 'Suite chronométrée', aide: 'Huit notes à lire d’affilée, le plus vite possible sans te tromper : c’est la fluidité qui compte.' },
     { id: 'morceaux', t: 'Notes de mes morceaux', aide: 'Les notes viennent de tes morceaux-objectifs, avec leurs altérations : dièse ou bémol avant le nom.' },
     { id: 'revisions', t: 'Révisions', aide: 'Seulement les notes dues aujourd’hui, toutes clés confondues. Rien de nouveau.' },
@@ -101,6 +106,7 @@
     etats = juste ? { [`${L}|${acc}`]: 'ok' } : { [`${L}|${acc}`]: 'faux' };
     const chemin = juste ? [degre(n)] : cheminDepuisRepere(degre(n), courant.clef);
     retour = { juste, nom: nomNote(n, style), place: placeSurPortee(n, courant.clef), chemin, choisi: L };
+    if (stockage.etat.reglages.direNoms) direNote(nomNote(n, 'latin'), juste ? 200 : (chemin.length - 1) * PAS_MS + 260);
     if (juste) {
       jouer(midi(n), 0.9);
       setTimeout(() => { if (retour?.juste) suivant(); }, 1000);
@@ -160,6 +166,62 @@
     return `Depuis le repère ${nomD(ch[0]!)} : ${ch.map((d, i) => (i === k ? retour!.nom : nomD(d).toLowerCase())).join(' → ')}, ${k} note${k > 1 ? 's' : ''} ${sens}.`;
   });
 
+  // ------------------------------------------------------------- manche et filigrane
+  /** Corde, doigt et position de la note montrée (doigté le plus simple). */
+  function doigteDe(n: Note) {
+    const m = midi(n);
+    const d = doigterAuto([{ midi: m, duree: 1 }])[0];
+    if (!d) return null;
+    const marque: Marque = { corde: d.corde, demiTons: demiTonsDe(m, d), etat: 'actif', texte: d.doigt === '0' ? '0' : d.doigt === 'p' ? 'P' : d.doigt };
+    const texte = d.doigt === '0' ? `corde de ${CORDES[d.corde]!.nom} à vide` : `corde de ${CORDES[d.corde]!.nom}, doigt ${d.doigt === 'p' ? 'pouce' : d.doigt}, ${courtPosition(d.position)}`;
+    return { marque, cadre: d.position || null, texte };
+  }
+  /** Indices de repères en filigrane : pleins pour une note nouvelle, ils pâlissent puis disparaissent avec la maîtrise. */
+  const OPACITE_PAR_BOITE = [0.85, 0.5, 0.22, 0, 0, 0];
+  const opaciteDe = (cle: string) => OPACITE_PAR_BOITE[stockage.etat.items[cle]?.boite ?? 0] ?? 0;
+
+  // ------------------------------------------------------------- placer (exercice inverse)
+  let cibleP = $state<ItemLecture | null>(null);
+  let retourP = $state<{ juste: boolean; choisi: number } | null>(null);
+  const cleP = (d: number) => `LP|${clef}|${d}`;
+  const poolPlacer = $derived(itemsOuverts(stockage.etat, clef).map((i) => ({ ...i, cle: cleP(i.d) })));
+  function suivantP() {
+    retourP = null;
+    cibleP = choisir(poolPlacer, stockage.etat, file);
+    debut = performance.now();
+    if (cibleP && stockage.etat.reglages.direNoms) direNote(nomNote(cibleP.note, 'latin'), 150);
+  }
+  function placer(d: number) {
+    const c = cibleP;
+    if (!c) return;
+    const bon = deDegre(d).L === c.note.L;
+    if (retourP) {
+      if (!retourP.juste && bon) suivantP();
+      return;
+    }
+    enregistrerReponse(stockage.etat, c.cle, bon, performance.now() - debut);
+    apresReponse(file, c.cle, bon);
+    stockage.modifie();
+    score.total++;
+    if (bon) { score.justes++; score.serie++; } else score.serie = 0;
+    retourP = { juste: bon, choisi: d };
+    jouer(midi(deDegre(d)), 0.5);
+    if (!bon) jouer(midi(c.note), 1.0, { dans: 0.6 });
+    if (stockage.etat.reglages.direNoms) direNote(nomNote(bon ? deDegre(d) : c.note, 'latin'), bon ? 200 : 820);
+    if (bon) setTimeout(() => { if (retourP?.juste) suivantP(); }, 1000);
+  }
+  const notesPlacer = $derived.by<(NotePortee | null)[]>(() => {
+    const slots: (NotePortee | null)[] = Array(SLOTS).fill(null);
+    if (!cibleP || !retourP) return slots;
+    const ch = deDegre(retourP.choisi);
+    if (retourP.juste) slots[SLOT_QUESTION] = { n: ch, etat: 'ok', morph: nomD(retourP.choisi), delai: -120 };
+    else {
+      slots[SLOT_QUESTION - 1] = { n: ch, etat: 'faux', morph: nomD(retourP.choisi).toLowerCase(), petitMorph: true, delai: -120 };
+      slots[SLOT_QUESTION + 1] = { n: cibleP.note, morph: nomD(cibleP.d), delai: 380 };
+    }
+    return slots;
+  });
+
   // ------------------------------------------------------------- suite chronométrée
   let suite = $state<ItemLecture[]>([]);
   let position = $state(0);
@@ -202,6 +264,7 @@
       score = { justes: 0, total: 0, serie: 0 };
       file = nouvelleFile(4);
       if (mode === 'suite') nouvelleSuite();
+      else if (mode === 'placer') suivantP();
       else suivant();
     });
   });
@@ -228,7 +291,7 @@
         {/each}
       </div>
     {/if}
-    {#if mode === 'nommer'}
+    {#if mode === 'nommer' || mode === 'placer'}
       <div class="etapes">
         {#each ETAPES as e, k (e.id)}
           <button class="etape" aria-pressed={etapeChoisie === k} disabled={k >= ouvertes} onclick={() => (etapeChoisie = k)}
@@ -253,9 +316,47 @@
         <p class="discret">Note {position + 1} sur {suite.length}{position === 0 ? ' : le chronomètre part à ta première réponse.' : ''}</p>
         <ChoixNote {style} onchoix={(L) => repondreSuite(L)} />
       {/if}
+    {:else if mode === 'placer'}
+      {#if cibleP}
+        {@const dgp = retourP ? doigteDe(retourP.juste ? deDegre(retourP.choisi) : cibleP.note) : null}
+        <p class="question">Place <span class="nom-note" style={`color:var(--n${cibleP.note.L})`}>{nomD(cibleP.d)}</span> sur la portée</p>
+        <div class="scene">
+          <div class="portee-grande seule">
+            <Portee notes={notesPlacer} cle={clef} nomCle={false} opaciteAides={opaciteDe(cibleP.cle)} espacement={64} hauteur={164}
+              onplace={placer} xPlace={SLOT_QUESTION} titre="Portée : touche une ligne ou un interligne" />
+          </div>
+          <div class="mini-manche" class:vide={!dgp}>
+            <Manche marques={dgp ? [dgp.marque] : []} cadre={dgp?.cadre ?? null} hauteur="270px" titre="Où jouer cette note" />
+            <p class="discret">{dgp ? dgp.texte : 'Corde et doigt après ta réponse'}</p>
+          </div>
+        </div>
+        <div class={`retour ${retourP ? (retourP.juste ? 'r-ok' : 'r-faux') : ''}`} aria-live="polite">
+          {#if retourP?.juste}
+            <p class="grand bien">Oui : <span class="nom-note" style={`color:var(--n${cibleP.note.L})`}>{nomD(retourP.choisi)}</span> <span class="place">({placeSurPortee(deDegre(retourP.choisi), clef)})</span></p>
+          {:else if retourP}
+            <p class="grand mal">Ici, c’est {nomD(retourP.choisi).toLowerCase()}</p>
+            <p class="chemin">{nomD(cibleP.d)} est {placeSurPortee(cibleP.note, clef)}. Touche sa place pour continuer.</p>
+          {:else}
+            <p class="discret">Survole la portée : la note suit ta souris. Touche pour répondre.</p>
+          {/if}
+        </div>
+        <div class="stats">
+          <span>Justes <b>{score.justes}/{score.total}</b></span>
+          <span>Série <b>{score.serie}</b></span>
+        </div>
+      {:else}
+        <p>Aucune note dans cette étape.</p>
+      {/if}
     {:else if courant}
-      <div class="portee-grande seule">
-        <Portee notes={notePortee} cle={courant.clef} nomCle={false} espacement={64} hauteur={164} />
+      {@const dg = retour ? doigteDe(courant.note) : null}
+      <div class="scene">
+        <div class="portee-grande seule">
+          <Portee notes={notePortee} cle={courant.clef} nomCle={false} opaciteAides={opaciteDe(courant.cle)} espacement={64} hauteur={164} />
+        </div>
+        <div class="mini-manche" class:vide={!dg}>
+          <Manche marques={dg ? [dg.marque] : []} cadre={dg?.cadre ?? null} hauteur="270px" titre="Où jouer cette note" />
+          <p class="discret">{dg ? dg.texte : 'Corde et doigt après ta réponse'}</p>
+        </div>
       </div>
       {#if mode === 'revisions'}<p class="discret">{CLES[courant.clef].label}</p>{/if}
       <div class={`retour ${retour ? (retour.juste ? 'r-ok' : 'r-faux') : ''}`} aria-live="polite">
@@ -305,6 +406,12 @@
   .exercice { display: flex; flex-direction: column; gap: .9rem; }
   .portee-grande { overflow-x: auto; }
   .portee-grande.seule { max-width: 620px; width: 100%; margin: 0 auto; }
+  .scene { display: flex; align-items: center; justify-content: center; gap: 1rem; }
+  .scene .portee-grande.seule { flex: 1; margin: 0; }
+  .mini-manche { display: flex; flex-direction: column; align-items: center; gap: .3rem; width: 170px; flex: none; transition: opacity .2s; }
+  .mini-manche p { margin: 0; font-size: .8rem; text-align: center; }
+  .mini-manche.vide :global(svg) { opacity: .35; }
+  .question { margin: 0; text-align: center; font-size: 1.4rem; font-family: var(--f-display); }
   .retour { min-height: 4.6rem; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: .2rem; text-align: center;
     border-radius: 10px; padding: .4rem .8rem; transition: background .15s; }
   .retour p { margin: 0; }
