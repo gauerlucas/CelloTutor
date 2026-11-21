@@ -17,9 +17,26 @@ export interface Reglages {
   tenueMicro: 'courte' | 'normale' | 'longue';
   /** Son des notes jouées par l'appli : enregistrements de violoncelle ou synthèse. */
   timbre: 'echantillons' | 'synthese';
-  /** Dire à voix haute le nom des notes dans les exercices de lecture. */
-  direNoms: boolean;
+  /** Nom des notes dans les exercices de lecture : chanté à sa hauteur, parlé, ou rien. */
+  voixNoms: 'chantee' | 'parlee' | 'aucune';
+  /** Palais des notes : une image et un mot par nom de note (do → si). */
+  palais: ImageNote[];
 }
+
+export interface ImageNote {
+  image: string;
+  mot: string;
+}
+
+export const PALAIS_DEFAUT: ImageNote[] = [
+  { image: '🐬', mot: 'dauphin' },
+  { image: '⏰', mot: 'réveil' },
+  { image: '🍯', mot: 'miel' },
+  { image: '🎺', mot: 'fanfare' },
+  { image: '☀️', mot: 'soleil' },
+  { image: '🏞️', mot: 'lac' },
+  { image: '🦢', mot: 'cygne' },
+];
 
 /** État de répétition espacée d'un exercice (boîtes 0 → 5, comme dans l'ébauche B). */
 export interface ItemRevision {
@@ -106,7 +123,8 @@ export const REGLAGES_DEFAUT: Reglages = {
   dureeParDefaut: 60,
   tenueMicro: 'normale',
   timbre: 'echantillons',
-  direNoms: true,
+  voixNoms: 'chantee',
+  palais: PALAIS_DEFAUT.map((x) => ({ ...x })),
 };
 
 export function etatInitial(maintenant = Date.now()): Etat {
@@ -147,7 +165,12 @@ export function normaliser(brut: unknown): Etat | null {
   if (reglages.nomsNotes === 'latin' || reglages.nomsNotes === 'anglo') r.nomsNotes = reglages.nomsNotes;
   if (typeof reglages.volume === 'number' && reglages.volume >= 0 && reglages.volume <= 1) r.volume = reglages.volume;
   if (reglages.tenueMicro === 'courte' || reglages.tenueMicro === 'normale' || reglages.tenueMicro === 'longue') r.tenueMicro = reglages.tenueMicro;
-  if (typeof reglages.direNoms === 'boolean') r.direNoms = reglages.direNoms;
+  if (reglages.voixNoms === 'chantee' || reglages.voixNoms === 'parlee' || reglages.voixNoms === 'aucune') r.voixNoms = reglages.voixNoms;
+  else if (reglages.direNoms === false) r.voixNoms = 'aucune';
+  r.palais = PALAIS_DEFAUT.map((d, i) => {
+    const x = Array.isArray(reglages.palais) ? (reglages.palais[i] as Partial<ImageNote> | undefined) : undefined;
+    return { image: typeof x?.image === 'string' ? x.image.slice(0, 8) : d.image, mot: typeof x?.mot === 'string' ? x.mot.slice(0, 30) : d.mot };
+  });
   if (reglages.timbre === 'echantillons' || reglages.timbre === 'synthese') r.timbre = reglages.timbre;
   if (typeof reglages.dureeParDefaut === 'number' && reglages.dureeParDefaut >= 5 && reglages.dureeParDefaut <= 240) r.dureeParDefaut = reglages.dureeParDefaut;
   return {

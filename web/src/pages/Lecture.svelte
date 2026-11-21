@@ -8,6 +8,7 @@
   import { doigterAuto, demiTonsDe, courtPosition } from '../lib/morceaux/doigte';
   import { CORDES } from '../lib/musique/violoncelle';
   import { direNote } from '../lib/audio/voix';
+  import { chanter } from '../lib/audio/chant';
   import { stockage } from '../lib/stockage.svelte';
   import { jouer } from '../lib/audio/son';
   import { CLES, CORDE_DU_DEGRE, cheminDepuisRepere, placeSurPortee, type Cle } from '../lib/musique/cles';
@@ -106,10 +107,10 @@
     etats = juste ? { [`${L}|${acc}`]: 'ok' } : { [`${L}|${acc}`]: 'faux' };
     const chemin = juste ? [degre(n)] : cheminDepuisRepere(degre(n), courant.clef);
     retour = { juste, nom: nomNote(n, style), place: placeSurPortee(n, courant.clef), chemin, choisi: L };
-    if (stockage.etat.reglages.direNoms) direNote(nomNote(n, 'latin'), juste ? 200 : (chemin.length - 1) * PAS_MS + 260);
+    annoncer(n, juste ? 650 : (chemin.length - 1) * PAS_MS + 1150);
     if (juste) {
       jouer(midi(n), 0.9);
-      setTimeout(() => { if (retour?.juste) suivant(); }, 1000);
+      setTimeout(() => { if (retour?.juste) suivant(); }, attenteJuste());
     } else {
       // On entend le chemin, du repère à la note, puis la note tenue.
       chemin.forEach((d, k) => {
@@ -130,7 +131,7 @@
       return slots;
     }
     if (retour.juste) {
-      slots[SLOT_QUESTION] = { n: courant.note, etat: 'ok', morph: retour.nom, delai: -120 };
+      slots[SLOT_QUESTION] = { n: courant.note, etat: 'ok', morph: retour.nom, image: palais[courant.note.L]?.image, delai: -120 };
       return slots;
     }
     const ch = retour.chemin;
@@ -144,6 +145,7 @@
         n,
         etat: derniere ? 'faux' : premiere ? couleurRepere(d) : 'pas',
         morph: derniere ? retour!.nom : premiere ? nomD(d) : nomD(d).toLowerCase(),
+        image: derniere || premiere ? palais[n.L]?.image : undefined,
         petitMorph: !derniere && !premiere,
         petite: !derniere && !premiere,
         delai: derniere ? undefined : k * PAS_MS,
@@ -165,6 +167,22 @@
     const sens = ch[1]! > ch[0]! ? 'au-dessus' : 'en dessous';
     return `Depuis le repère ${nomD(ch[0]!)} : ${ch.map((d, i) => (i === k ? retour!.nom : nomD(d).toLowerCase())).join(' → ')}, ${k} note${k > 1 ? 's' : ''} ${sens}.`;
   });
+
+  // ------------------------------------------------------------- voix et palais des notes
+  const palais = $derived(stockage.etat.reglages.palais);
+  /**
+   * Annonce une note : chantée à sa hauteur exacte (syllabe de solfège), ou dite avec le mot
+   * de son image. `question` : dans Placer, on ne donne que le nom, sans le son de la note.
+   */
+  function annoncer(n: Note, dansMs: number, question = false) {
+    const v = stockage.etat.reglages.voixNoms;
+    if (v === 'chantee' && !question) chanter(midi(n), n.L, dansMs / 1000);
+    else if (v !== 'aucune') {
+      const mot = stockage.etat.reglages.palais[n.L]?.mot;
+      direNote(nomNote(n, 'latin') + (mot && !question ? `, ${mot}` : ''), dansMs);
+    }
+  }
+  const attenteJuste = () => (stockage.etat.reglages.voixNoms === 'aucune' ? 1000 : 1700);
 
   // ------------------------------------------------------------- manche et filigrane
   /** Corde, doigt et position de la note montrée (doigté le plus simple). */
@@ -189,7 +207,7 @@
     retourP = null;
     cibleP = choisir(poolPlacer, stockage.etat, file);
     debut = performance.now();
-    if (cibleP && stockage.etat.reglages.direNoms) direNote(nomNote(cibleP.note, 'latin'), 150);
+    if (cibleP) annoncer(cibleP.note, 150, true);
   }
   function placer(d: number) {
     const c = cibleP;
@@ -207,17 +225,17 @@
     retourP = { juste: bon, choisi: d };
     jouer(midi(deDegre(d)), 0.5);
     if (!bon) jouer(midi(c.note), 1.0, { dans: 0.6 });
-    if (stockage.etat.reglages.direNoms) direNote(nomNote(bon ? deDegre(d) : c.note, 'latin'), bon ? 200 : 820);
-    if (bon) setTimeout(() => { if (retourP?.juste) suivantP(); }, 1000);
+    annoncer(bon ? deDegre(d) : c.note, bon ? 600 : 1650);
+    if (bon) setTimeout(() => { if (retourP?.juste) suivantP(); }, attenteJuste());
   }
   const notesPlacer = $derived.by<(NotePortee | null)[]>(() => {
     const slots: (NotePortee | null)[] = Array(SLOTS).fill(null);
     if (!cibleP || !retourP) return slots;
     const ch = deDegre(retourP.choisi);
-    if (retourP.juste) slots[SLOT_QUESTION] = { n: ch, etat: 'ok', morph: nomD(retourP.choisi), delai: -120 };
+    if (retourP.juste) slots[SLOT_QUESTION] = { n: ch, etat: 'ok', morph: nomD(retourP.choisi), image: palais[ch.L]?.image, delai: -120 };
     else {
       slots[SLOT_QUESTION - 1] = { n: ch, etat: 'faux', morph: nomD(retourP.choisi).toLowerCase(), petitMorph: true, delai: -120 };
-      slots[SLOT_QUESTION + 1] = { n: cibleP.note, morph: nomD(cibleP.d), delai: 380 };
+      slots[SLOT_QUESTION + 1] = { n: cibleP.note, morph: nomD(cibleP.d), image: palais[cibleP.note.L]?.image, delai: 380 };
     }
     return slots;
   });
@@ -319,7 +337,7 @@
     {:else if mode === 'placer'}
       {#if cibleP}
         {@const dgp = retourP ? doigteDe(retourP.juste ? deDegre(retourP.choisi) : cibleP.note) : null}
-        <p class="question">Place <span class="nom-note" style={`color:var(--n${cibleP.note.L})`}>{nomD(cibleP.d)}</span> sur la portée</p>
+        <p class="question">Place <span class="nom-note" style={`color:var(--n${cibleP.note.L})`}>{nomD(cibleP.d)}</span> <span class="image-note">{palais[cibleP.note.L]?.image}</span> sur la portée</p>
         <div class="scene">
           <div class="portee-grande seule">
             <Portee notes={notesPlacer} cle={clef} nomCle={false} opaciteAides={opaciteDe(cibleP.cle)} espacement={64} hauteur={164}
@@ -361,9 +379,9 @@
       {#if mode === 'revisions'}<p class="discret">{CLES[courant.clef].label}</p>{/if}
       <div class={`retour ${retour ? (retour.juste ? 'r-ok' : 'r-faux') : ''}`} aria-live="polite">
         {#if retour?.juste}
-          <p class="grand bien">Oui : <span class="nom-note" style={`color:var(--n${courant.note.L})`}>{retour.nom}</span></p>
+          <p class="grand bien">Oui : <span class="nom-note" style={`color:var(--n${courant.note.L})`}>{retour.nom}</span> <span class="image-note">{palais[courant.note.L]?.image} {palais[courant.note.L]?.mot}</span></p>
         {:else if retour}
-          <p class="grand mal">C’est <span class="nom-note" style={`color:var(--n${courant.note.L})`}>{retour.nom}</span> <span class="place">({retour.place})</span></p>
+          <p class="grand mal">C’est <span class="nom-note" style={`color:var(--n${courant.note.L})`}>{retour.nom}</span> <span class="image-note">{palais[courant.note.L]?.image} {palais[courant.note.L]?.mot}</span> <span class="place">({retour.place})</span></p>
           <p class="chemin">{texteChemin}</p>
         {:else}
           <p class="discret">Quelle est cette note ?</p>
@@ -419,6 +437,7 @@
   .retour.r-faux { background: color-mix(in srgb, var(--bad) 13%, var(--surface)); }
   .grand { font-size: 1.5rem; font-family: var(--f-display); }
   .nom-note { font-weight: 800; }
+  .image-note { font: 500 1rem var(--f-body); color: var(--ink-soft); }
   .place { font-size: 1rem; font-family: var(--f-body); font-weight: 500; }
   .chemin { font-size: 1.05rem; color: var(--ink); }
   .consigne { margin: 0; width: 100%; max-width: none; text-align: center; color: var(--ink-soft); }

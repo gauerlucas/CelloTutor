@@ -52,3 +52,20 @@ describe('choisirPlusRecent', () => {
     expect(choisirPlusRecent(null, null)).toBeNull();
   });
 });
+
+describe('voix et palais des notes', () => {
+  it('ancien réglage « ne pas dire les noms » devient silencieux', () => {
+    const e = etatInitial(0) as unknown as Record<string, Record<string, unknown>>;
+    delete e.reglages!.voixNoms;
+    e.reglages!.direNoms = false;
+    expect(normaliser(JSON.parse(JSON.stringify(e)))!.reglages.voixNoms).toBe('aucune');
+  });
+  it('palais incomplet complété par les images proposées', () => {
+    const e = etatInitial(0) as unknown as Record<string, Record<string, unknown>>;
+    e.reglages!.palais = [{ image: '🎻', mot: 'violoncelle' }];
+    const r = normaliser(JSON.parse(JSON.stringify(e)))!.reglages;
+    expect(r.palais).toHaveLength(7);
+    expect(r.palais[0]).toEqual({ image: '🎻', mot: 'violoncelle' });
+    expect(r.palais[2]!.mot).toBe('miel');
+  });
+});

@@ -15,6 +15,8 @@
     /** La tête de note se change en ce nom, écrit à sa place exacte sur la portée. */
     morph?: string;
     petitMorph?: boolean;
+    /** Image du palais des notes, au-dessus du nom. */
+    image?: string;
     /** Moment du changement en nom (ms), si différent de l'apparition. */
     delaiMorph?: number;
   }
@@ -124,6 +126,10 @@
       {#if it.morph}
         <text class={`morph ${it.petitMorph ? 'petit' : ''}`} x={cx} y={cy} text-anchor="middle" dominant-baseline="central"
           style={`fill:var(--n${it.n.L});animation-delay:${(it.delaiMorph ?? it.delai ?? 0) + 220}ms`}>{it.morph}</text>
+        {#if it.image}
+          <text class="morph image" x={cx} y={cy < 40 ? cy + (it.petitMorph ? 20 : 26) : cy - (it.petitMorph ? 20 : 26)} text-anchor="middle" dominant-baseline="central"
+            style={`animation-delay:${(it.delaiMorph ?? it.delai ?? 0) + 320}ms`}>{it.image}</text>
+        {/if}
       {/if}
       {#if it.nom}
         <text class={`nom ${it.etat ?? ''} ${it.petite ? 'petit' : ''}`} x={cx + (it.petite ? 9 : 12)} y={cy - (it.petite ? 7 : 9)}>{it.nom}</text>
@@ -180,6 +186,7 @@
   @keyframes fond { to { opacity: .13; } }
   .morph { font: 800 26px var(--f-body); paint-order: stroke; stroke: var(--surface); stroke-width: 5px; opacity: 0;
     transform-box: fill-box; transform-origin: center; animation: morph .38s cubic-bezier(.2, 1.4, .5, 1) forwards; }
+  .morph.image { font-size: 22px; stroke-width: 0; }
   .morph.petit { font-size: 17px; font-weight: 700; stroke-width: 4px; }
   @keyframes morph { from { opacity: 0; transform: scale(.25); } to { opacity: 1; transform: scale(1); } }
   @media (prefers-reduced-motion: reduce) { .morph { animation: none; opacity: 1; } .tete.morphe { animation: none; opacity: .13; } }

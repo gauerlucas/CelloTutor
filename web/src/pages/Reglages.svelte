@@ -3,9 +3,32 @@
   import { exporterFichier, importerFichier } from '../lib/persistance';
   import type { Etat } from '../lib/etat';
   import { jouer, reglerTimbre, type Timbre } from '../lib/audio/son';
+  import { chanter } from '../lib/audio/chant';
+  import { contexteAudio } from '../lib/audio/son';
+  import { importerVoix, oublierVoix, surChangementVoix, voixEnregistree } from '../lib/audio/voixImportee';
+  import { onMount } from 'svelte';
+  import { NOMS_LATINS } from '../lib/musique/notes';
+  import { PALAIS_DEFAUT } from '../lib/etat';
 
   const r = $derived(stockage.etat.reglages);
   let messageImport = $state('');
+  let aVoix = $state(voixEnregistree());
+  let messageVoix = $state('');
+  let analyse = $state(false);
+  onMount(() => surChangementVoix(() => (aVoix = voixEnregistree())));
+
+  async function surVoix(ev: Event) {
+    const input = ev.currentTarget as HTMLInputElement;
+    const f = input.files?.[0];
+    if (!f) return;
+    analyse = true;
+    messageVoix = 'Analyse de l’enregistrement…';
+    const r = await importerVoix(f, contexteAudio());
+    analyse = false;
+    messageVoix = r.message;
+    input.value = '';
+    if (r.ok) [0, 2, 4, 5, 7, 9, 11, 12].forEach((d, k) => chanter(48 + d, k, k * 0.6, 0.5));
+  }
 
   async function surFichier(ev: Event) {
     const input = ev.currentTarget as HTMLInputElement;
@@ -77,15 +100,49 @@
     </select>
   </label>
   <label class="ligne">
-    <span class="etiquette">Nom des notes à voix haute</span>
-    <input type="checkbox" checked={r.direNoms} onchange={(e) => stockage.regler('direNoms', e.currentTarget.checked)} />
-    <span class="discret">dans les exercices de lecture</span>
+    <span class="etiquette">Nom des notes</span>
+    <select value={r.voixNoms} onchange={(e) => stockage.regler('voixNoms', e.currentTarget.value as 'chantee' | 'parlee' | 'aucune')}>
+      <option value="chantee">Chanté à la hauteur de la note</option>
+      <option value="parlee">Dit à voix haute, avec le mot du palais</option>
+      <option value="aucune">Silencieux</option>
+    </select>
   </label>
   <label class="ligne">
     <span class="etiquette">Volume</span>
     <input type="range" min="0" max="1" step="0.05" value={r.volume} onchange={(e) => stockage.regler('volume', Number(e.currentTarget.value))} />
     <span class="discret">{Math.round(r.volume * 100)} %</span>
   </label>
+  <div class="voix">
+    <p class="etiquette">Voix qui chante les notes</p>
+    <p class="discret">
+      {aVoix ? 'Voix enregistrée : chaque syllabe est transposée à la hauteur demandée.' : 'Voix de synthèse.'}
+      Pour une vraie voix, importe un enregistrement d’une gamme de do majeur chantée en solfège (do ré mi fa sol la si do), une syllabe tenue par note. Ta propre voix marche très bien. Le fichier reste sur cet appareil.
+    </p>
+    <div class="actions">
+      <label class="btn" class:inactif={analyse}>
+        Importer une gamme chantée
+        <input type="file" accept="audio/*" onchange={surVoix} hidden disabled={analyse} />
+      </label>
+      <button class="btn" onclick={() => [0, 2, 4, 5, 7, 9, 11, 12].forEach((d, k) => chanter(48 + d, k, k * 0.6, 0.5))}>▶ Écouter la gamme</button>
+      {#if aVoix}<button class="btn discret-btn" onclick={() => { void oublierVoix(); messageVoix = 'Retour à la voix de synthèse.'; }}>Revenir à la synthèse</button>{/if}
+    </div>
+    {#if messageVoix}<p role="status">{messageVoix}</p>{/if}
+  </div>
+  <div class="palais">
+    <p class="etiquette">Palais des notes</p>
+    <p class="discret">Une image et un mot par note, qui apparaissent quand la note se change en nom. Choisis les tiens : une image qu’on a inventée soi-même se retient mieux.</p>
+    {#each r.palais as x, i (i)}
+      <div class="ligne-palais">
+        <span class="nom-palais" style={`color:var(--n${i})`}>{NOMS_LATINS[i]}</span>
+        <input class="emoji" value={x.image} maxlength="8" aria-label={`Image de ${NOMS_LATINS[i]}`}
+          onchange={(e) => stockage.regler('palais', r.palais.map((y, k) => (k === i ? { ...y, image: e.currentTarget.value } : y)))} />
+        <input value={x.mot} maxlength="30" aria-label={`Mot de ${NOMS_LATINS[i]}`}
+          onchange={(e) => stockage.regler('palais', r.palais.map((y, k) => (k === i ? { ...y, mot: e.currentTarget.value } : y)))} />
+        <button class="btn" title="Écouter la syllabe chantée" onclick={() => chanter(48 + [0, 2, 4, 5, 7, 9, 11][i]!, i)}>▶</button>
+      </div>
+    {/each}
+    <button class="btn discret-btn" onclick={() => stockage.regler('palais', PALAIS_DEFAUT.map((x) => ({ ...x })))}>Images proposées</button>
+  </div>
   <p class="discret credit">Sons de violoncelle : pack « real cello notes » de flcellogrl sur Freesound (<a href="https://freesound.org/people/flcellogrl/packs/12408/" target="_blank" rel="noopener">lien</a>), licence CC BY 4.0. Les notes absentes du pack sont transposées depuis la plus proche.</p>
 </section>
 
@@ -113,9 +170,18 @@
   .bloc p { margin: 0; }
   .ligne { display: flex; flex-wrap: wrap; align-items: center; gap: .4rem 1rem; }
   .ligne .etiquette { min-width: 11rem; }
+  .voix { display: flex; flex-direction: column; gap: .4rem; }
+  .inactif { opacity: .5; pointer-events: none; }
   .actions { display: flex; flex-wrap: wrap; gap: .6rem; }
   label.btn { display: inline-flex; align-items: center; }
   select { font: inherit; padding: .3em .5em; border-radius: 7px; border: 1px solid var(--rule); background: var(--surface); color: var(--ink); }
   code { font-family: var(--f-mono); font-size: .88em; word-break: break-all; }
+  .palais { display: flex; flex-direction: column; gap: .35rem; margin-top: .8rem; }
+  .palais p { margin: 0; }
+  .ligne-palais { display: flex; gap: .5rem; align-items: center; }
+  .nom-palais { width: 3rem; font-weight: 800; }
+  .ligne-palais input { font: inherit; padding: .25em .5em; border: 1px solid var(--rule); border-radius: 6px; background: var(--surface); color: var(--ink); }
+  .ligne-palais input.emoji { width: 3.4rem; text-align: center; font-size: 1.2rem; }
+  .discret-btn { font-size: .82rem; padding: .3em .7em; align-self: flex-start; }
   .credit { font-size: .8rem; margin: .6rem 0 0; }
 </style>
