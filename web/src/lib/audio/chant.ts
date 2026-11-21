@@ -11,6 +11,7 @@
 
 import { contexteAudio } from './son';
 import { hzDeMidi } from '../musique/notes';
+import { chanterEnregistre, voixEnregistree } from './voixImportee';
 
 type Voyelle = 'a' | 'e' | 'i' | 'o';
 /** Formants [fréquence, largeur de bande] d'une voix d'homme, F1 à F5. */
@@ -131,6 +132,14 @@ export function chanter(m: number, L: number, dans = 0, duree = 0.75, volume = 0
   const sortie = c.createGain();
   sortie.gain.value = volume;
   sortie.connect(c.destination);
+  // voix enregistrée par l'utilisateur (gamme importée) : elle passe avant la synthèse
+  if (voixEnregistree()) {
+    const finE = chanterEnregistre(c, sortie, m, L, t0, duree);
+    if (finE !== null) {
+      if (!ctx) setTimeout(() => sortie.disconnect(), (finE - c.currentTime + 0.5) * 1000);
+      return finE;
+    }
+  }
   const envoi = c.createGain();
   envoi.gain.value = 0.22;
   sortie.connect(envoi);

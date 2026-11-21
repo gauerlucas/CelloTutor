@@ -4,11 +4,31 @@
   import type { Etat } from '../lib/etat';
   import { jouer, reglerTimbre, type Timbre } from '../lib/audio/son';
   import { chanter } from '../lib/audio/chant';
+  import { contexteAudio } from '../lib/audio/son';
+  import { importerVoix, oublierVoix, surChangementVoix, voixEnregistree } from '../lib/audio/voixImportee';
+  import { onMount } from 'svelte';
   import { NOMS_LATINS } from '../lib/musique/notes';
   import { PALAIS_DEFAUT } from '../lib/etat';
 
   const r = $derived(stockage.etat.reglages);
   let messageImport = $state('');
+  let aVoix = $state(voixEnregistree());
+  let messageVoix = $state('');
+  let analyse = $state(false);
+  onMount(() => surChangementVoix(() => (aVoix = voixEnregistree())));
+
+  async function surVoix(ev: Event) {
+    const input = ev.currentTarget as HTMLInputElement;
+    const f = input.files?.[0];
+    if (!f) return;
+    analyse = true;
+    messageVoix = 'Analyse de l’enregistrement…';
+    const r = await importerVoix(f, contexteAudio());
+    analyse = false;
+    messageVoix = r.message;
+    input.value = '';
+    if (r.ok) [0, 2, 4, 5, 7, 9, 11, 12].forEach((d, k) => chanter(48 + d, k, k * 0.6, 0.5));
+  }
 
   async function surFichier(ev: Event) {
     const input = ev.currentTarget as HTMLInputElement;
@@ -92,6 +112,22 @@
     <input type="range" min="0" max="1" step="0.05" value={r.volume} onchange={(e) => stockage.regler('volume', Number(e.currentTarget.value))} />
     <span class="discret">{Math.round(r.volume * 100)} %</span>
   </label>
+  <div class="voix">
+    <p class="etiquette">Voix qui chante les notes</p>
+    <p class="discret">
+      {aVoix ? 'Voix enregistrée : chaque syllabe est transposée à la hauteur demandée.' : 'Voix de synthèse.'}
+      Pour une vraie voix, importe un enregistrement d’une gamme de do majeur chantée en solfège (do ré mi fa sol la si do), une syllabe tenue par note. Ta propre voix marche très bien. Le fichier reste sur cet appareil.
+    </p>
+    <div class="actions">
+      <label class="btn" class:inactif={analyse}>
+        Importer une gamme chantée
+        <input type="file" accept="audio/*" onchange={surVoix} hidden disabled={analyse} />
+      </label>
+      <button class="btn" onclick={() => [0, 2, 4, 5, 7, 9, 11, 12].forEach((d, k) => chanter(48 + d, k, k * 0.6, 0.5))}>▶ Écouter la gamme</button>
+      {#if aVoix}<button class="btn discret-btn" onclick={() => { void oublierVoix(); messageVoix = 'Retour à la voix de synthèse.'; }}>Revenir à la synthèse</button>{/if}
+    </div>
+    {#if messageVoix}<p role="status">{messageVoix}</p>{/if}
+  </div>
   <div class="palais">
     <p class="etiquette">Palais des notes</p>
     <p class="discret">Une image et un mot par note, qui apparaissent quand la note se change en nom. Choisis les tiens : une image qu’on a inventée soi-même se retient mieux.</p>
@@ -134,6 +170,8 @@
   .bloc p { margin: 0; }
   .ligne { display: flex; flex-wrap: wrap; align-items: center; gap: .4rem 1rem; }
   .ligne .etiquette { min-width: 11rem; }
+  .voix { display: flex; flex-direction: column; gap: .4rem; }
+  .inactif { opacity: .5; pointer-events: none; }
   .actions { display: flex; flex-wrap: wrap; gap: .6rem; }
   label.btn { display: inline-flex; align-items: center; }
   select { font: inherit; padding: .3em .5em; border-radius: 7px; border: 1px solid var(--rule); background: var(--surface); color: var(--ink); }

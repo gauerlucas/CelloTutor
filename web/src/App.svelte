@@ -16,6 +16,7 @@
   import BilanSeance from './components/BilanSeance.svelte';
   import { seance } from './lib/seance.svelte';
   import { contexteAudio, reglerTimbre, reglerVolume } from './lib/audio/son';
+  import { chargerVoix } from './lib/audio/voixImportee';
   // Dès le premier geste, l'audio s'ouvre et les échantillons se décodent : la première note
   // jouée a déjà le vrai son.
   if (typeof window !== 'undefined') window.addEventListener('pointerdown', () => contexteAudio(), { once: true });
@@ -30,6 +31,7 @@
     };
     addEventListener('hashchange', surHash);
     void stockage.charger();
+    void chargerVoix();
     seance.restaurer();
     return () => removeEventListener('hashchange', surHash);
   });
