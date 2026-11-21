@@ -6,8 +6,8 @@
   import ChoixNote from '../components/ChoixNote.svelte';
   import { stockage } from '../lib/stockage.svelte';
   import { jouer } from '../lib/audio/son';
-  import { CLES, indiceEcart, placeSurPortee, type Cle } from '../lib/musique/cles';
-  import { deDegre, midi, nomNote, type Note } from '../lib/musique/notes';
+  import { CLES, CORDE_DU_DEGRE, cheminDepuisRepere, placeSurPortee, type Cle } from '../lib/musique/cles';
+  import { deDegre, degre, midi, nomNote, type Note } from '../lib/musique/notes';
   import {
     cleLecture, ETAPES, etapesOuvertes, itemsEtape, itemsOuverts, maitriseEtape, notesParMinute, ORDRE_CLES, tirerSuite, type ItemLecture,
   } from '../lib/exercices/lecture';
@@ -66,7 +66,8 @@
   // ------------------------------------------------------------- nommer (et révisions, morceaux)
   let file = nouvelleFile(4);
   let courant = $state<{ cle: string; clef: Cle; d: number; note: Note } | null>(null);
-  let retour = $state<{ juste: boolean; texte: string; indice?: string } | null>(null);
+  /** Après une réponse : juste, ou la correction déroulée depuis le repère le plus proche. */
+  let retour = $state<{ juste: boolean; nom: string; place: string; chemin: number[]; choisi: number } | null>(null);
   let etats = $state<Record<string, 'ok' | 'faux'>>({});
   let debut = 0;
   let score = $state({ justes: 0, total: 0, serie: 0 });
@@ -81,9 +82,15 @@
     debut = performance.now();
   }
 
+  const PAS_MS = 300;
   function repondre(L: number, acc: number) {
-    if (!courant || retour) return;
+    if (!courant) return;
     const n = courant.note;
+    // Après une erreur, on continue en rejouant soi-même la bonne réponse (elle se grave mieux).
+    if (retour) {
+      if (!retour.juste && L === n.L) suivant();
+      return;
+    }
     const juste = L === n.L && (mode !== 'morceaux' || acc === n.acc);
     const ms = performance.now() - debut;
     enregistrerReponse(stockage.etat, courant.cle, juste, ms);
@@ -91,13 +98,67 @@
     stockage.modifie();
     score.total++;
     if (juste) { score.justes++; score.serie++; } else score.serie = 0;
-    etats = { ...etats, [`${L}|${acc}`]: juste ? 'ok' : 'faux', [`${n.L}|${mode === 'morceaux' ? n.acc : 0}`]: 'ok' };
-    jouer(midi(n), 0.9);
-    retour = juste
-      ? { juste, texte: `Oui : ${nomNote(n, style)}.` }
-      : { juste, texte: `Non : c’est ${nomNote(n, style)}, ${placeSurPortee(n, courant.clef)}.`, indice: indiceEcart(n, courant.clef, nomD) };
-    if (juste) setTimeout(() => { if (retour?.juste) suivant(); }, 650);
+    etats = juste ? { [`${L}|${acc}`]: 'ok' } : { [`${L}|${acc}`]: 'faux' };
+    const chemin = juste ? [degre(n)] : cheminDepuisRepere(degre(n), courant.clef);
+    retour = { juste, nom: nomNote(n, style), place: placeSurPortee(n, courant.clef), chemin, choisi: L };
+    if (juste) {
+      jouer(midi(n), 0.9);
+      setTimeout(() => { if (retour?.juste) suivant(); }, 1000);
+    } else {
+      // On entend le chemin, du repère à la note, puis la note tenue.
+      chemin.forEach((d, k) => {
+        const m = k === chemin.length - 1 ? midi(n) : midi(deDegre(d));
+        jouer(m, k === chemin.length - 1 ? 1.1 : 0.32, { dans: (k * PAS_MS) / 1000 });
+      });
+    }
   }
+
+  const couleurRepere = (d: number) => (CORDE_DU_DEGRE[d] ? `rep-${CORDE_DU_DEGRE[d]}` : 'rep-autre');
+  /** Portée de l'exercice : la note seule, puis, après une erreur, l'escalier depuis le repère. */
+  const SLOTS = 7, SLOT_QUESTION = 3;
+  const notePortee = $derived.by<(NotePortee | null)[]>(() => {
+    if (!courant) return [];
+    const slots: (NotePortee | null)[] = Array(SLOTS).fill(null);
+    if (!retour) {
+      slots[SLOT_QUESTION] = { n: courant.note };
+      return slots;
+    }
+    if (retour.juste) {
+      slots[SLOT_QUESTION] = { n: courant.note, etat: 'ok', morph: retour.nom, delai: -120 };
+      return slots;
+    }
+    const ch = retour.chemin;
+    // la note visée reste à sa place quand c'est possible : l'escalier pousse vers la gauche
+    const fin = Math.min(SLOTS - 1, Math.max(SLOT_QUESTION, ch.length - 1));
+    ch.forEach((d, k) => {
+      const derniere = k === ch.length - 1;
+      const premiere = k === 0;
+      const n = derniere ? courant!.note : deDegre(d);
+      slots[fin - (ch.length - 1) + k] = {
+        n,
+        etat: derniere ? 'faux' : premiere ? couleurRepere(d) : 'pas',
+        morph: derniere ? retour!.nom : premiere ? nomD(d) : nomD(d).toLowerCase(),
+        petitMorph: !derniere && !premiere,
+        petite: !derniere && !premiere,
+        delai: derniere ? undefined : k * PAS_MS,
+        delaiMorph: k * PAS_MS,
+      };
+    });
+    return slots;
+  });
+  const texteChemin = $derived.by(() => {
+    if (!retour || retour.juste || !courant) return '';
+    const ch = retour.chemin;
+    if (ch.length === 1) {
+      const corde = CORDE_DU_DEGRE[ch[0]!];
+      return corde
+        ? `C’est un repère : la note de la corde de ${nomD(ch[0]!)} à vide (ligne de couleur).`
+        : `C’est un repère de la ${CLES[courant.clef].label} : à connaître par cœur.`;
+    }
+    const k = ch.length - 1;
+    const sens = ch[1]! > ch[0]! ? 'au-dessus' : 'en dessous';
+    return `Depuis le repère ${nomD(ch[0]!)} : ${ch.map((d, i) => (i === k ? retour!.nom : nomD(d).toLowerCase())).join(' → ')}, ${k} note${k > 1 ? 's' : ''} ${sens}.`;
+  });
 
   // ------------------------------------------------------------- suite chronométrée
   let suite = $state<ItemLecture[]>([]);
@@ -146,7 +207,6 @@
   });
 
   const pct = (k: number) => maitriseEtape(stockage.etat, clef, ETAPES[k]!);
-  const notePortee = $derived<NotePortee[]>(courant ? [{ n: courant.note, etat: retour ? (retour.juste ? 'ok' : 'faux') : undefined }] : []);
 </script>
 
 <div class="entete">
@@ -195,17 +255,24 @@
       {/if}
     {:else if courant}
       <div class="portee-grande seule">
-        <Portee notes={notePortee} cle={courant.clef} espacement={120} largeurMin={300} hauteur={200} />
+        <Portee notes={notePortee} cle={courant.clef} nomCle={false} espacement={64} hauteur={164} />
       </div>
       {#if mode === 'revisions'}<p class="discret">{CLES[courant.clef].label}</p>{/if}
-      <ChoixNote {style} alterations={mode === 'morceaux'} {etats} desactive={!!retour} onchoix={repondre} />
-      <div class="retour" aria-live="polite">
-        {#if retour}
-          <p class={retour.juste ? 'bien' : 'mal'}>{retour.texte}</p>
-          {#if retour.indice}<p class="discret">{retour.indice}</p>{/if}
-          {#if !retour.juste}<button class="btn primaire" onclick={suivant}>Suivante</button>{/if}
+      <div class={`retour ${retour ? (retour.juste ? 'r-ok' : 'r-faux') : ''}`} aria-live="polite">
+        {#if retour?.juste}
+          <p class="grand bien">Oui : <span class="nom-note" style={`color:var(--n${courant.note.L})`}>{retour.nom}</span></p>
+        {:else if retour}
+          <p class="grand mal">C’est <span class="nom-note" style={`color:var(--n${courant.note.L})`}>{retour.nom}</span> <span class="place">({retour.place})</span></p>
+          <p class="chemin">{texteChemin}</p>
+        {:else}
+          <p class="discret">Quelle est cette note ?</p>
         {/if}
       </div>
+      <ChoixNote {style} alterations={mode === 'morceaux'} {etats} desactive={!!retour?.juste}
+        attendu={retour && !retour.juste ? courant.note.L : null} onchoix={repondre} />
+      {#if retour && !retour.juste}
+        <p class="consigne">Appuie sur <b>{nomNote({ ...courant.note, acc: 0 }, style)}</b> (touche {courant.note.L + 1}) pour continuer. Cette note reviendra dans deux ou trois questions.</p>
+      {/if}
       <div class="stats">
         <span>Justes <b>{score.justes}/{score.total}</b></span>
         <span>Série <b>{score.serie}</b></span>
@@ -218,7 +285,7 @@
 
   <aside class="carte reperes">
     <p class="etiquette">Repères en {CLES[courant?.clef ?? clef].label}</p>
-    <Portee notes={CLES[courant?.clef ?? clef].reperes.map((d) => ({ n: deDegre(d), etiquette: nomD(d) }))} cle={courant?.clef ?? clef} aides espacement={56} hauteur={190} />
+    <Portee notes={CLES[courant?.clef ?? clef].reperes.map((d) => ({ n: deDegre(d), etiquette: nomD(d), etat: retour && !retour.juste && retour.chemin[0] === d ? couleurRepere(d) : undefined }))} cle={courant?.clef ?? clef} aides espacement={56} hauteur={190} />
     <p class="discret">Lis par écart : trouve le repère le plus proche, puis compte les lignes et les interlignes.</p>
   </aside>
 </div>
@@ -237,9 +304,17 @@
   .anneau { width: 14px; height: 14px; border-radius: 50%; background: conic-gradient(var(--good) calc(var(--p) * 1%), var(--rule) 0); }
   .exercice { display: flex; flex-direction: column; gap: .9rem; }
   .portee-grande { overflow-x: auto; }
-  .portee-grande.seule { max-width: 420px; }
-  .retour { min-height: 2.6rem; display: flex; flex-wrap: wrap; align-items: center; gap: .4rem 1rem; }
+  .portee-grande.seule { max-width: 620px; width: 100%; margin: 0 auto; }
+  .retour { min-height: 4.6rem; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: .2rem; text-align: center;
+    border-radius: 10px; padding: .4rem .8rem; transition: background .15s; }
   .retour p { margin: 0; }
+  .retour.r-ok { background: var(--good-bg); }
+  .retour.r-faux { background: color-mix(in srgb, var(--bad) 13%, var(--surface)); }
+  .grand { font-size: 1.5rem; font-family: var(--f-display); }
+  .nom-note { font-weight: 800; }
+  .place { font-size: 1rem; font-family: var(--f-body); font-weight: 500; }
+  .chemin { font-size: 1.05rem; color: var(--ink); }
+  .consigne { margin: 0; width: 100%; max-width: none; text-align: center; color: var(--ink-soft); }
   .bien { color: var(--good); font-weight: 700; }
   .mal { color: var(--bad); font-weight: 700; }
   .bilan { font-size: 1.15rem; font-weight: 700; margin: 0; }

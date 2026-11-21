@@ -43,3 +43,15 @@ describe('gammes', () => {
     expect(notesArpege(GAMMES[0]!, 2).map((x) => x.midi)).toEqual([36, 40, 43, 48, 52, 55, 60, 55, 52, 48, 43, 40, 36]);
   });
 });
+
+import { cheminDepuisRepere, repereProche } from '../musique/cles';
+
+describe('chemin depuis le repère', () => {
+  it('monte du La (clé de fa) jusqu’au Mi au-dessus de la portée', () => {
+    // A3 = 26 ; E4 = 30
+    expect(cheminDepuisRepere(30, 'fa')).toEqual([26, 27, 28, 29, 30]);
+  });
+  it('descend quand le repère est au-dessus', () => expect(cheminDepuisRepere(21, 'fa')).toEqual([22, 21]));
+  it('un repère se réduit à lui-même', () => expect(cheminDepuisRepere(18, 'fa')).toEqual([18]));
+  it('à égalité, prend le repère le plus grave', () => expect(repereProche(16, 'fa')).toBe(14));
+});

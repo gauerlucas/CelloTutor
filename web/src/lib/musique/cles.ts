@@ -48,3 +48,22 @@ export function indiceEcart(n: Note, cle: Cle, nom: (d: number) => string): stri
   const k = Math.abs(ecart);
   return `${k === 1 ? 'Une note' : `${k} notes`} ${ecart > 0 ? 'au-dessus' : 'en dessous'} du repère ${nom(proche)}.`;
 }
+
+/** Repère le plus proche d'un degré (à égalité, le plus grave). */
+export function repereProche(d: number, cle: Cle): number {
+  let proche = CLES[cle].reperes[0]!;
+  for (const x of CLES[cle].reperes) if (Math.abs(x - d) < Math.abs(proche - d)) proche = x;
+  return proche;
+}
+
+/** Le chemin note à note du repère le plus proche jusqu'au degré visé (les deux inclus). */
+export function cheminDepuisRepere(d: number, cle: Cle): number[] {
+  const r = repereProche(d, cle);
+  const pas = d >= r ? 1 : -1;
+  const out: number[] = [];
+  for (let k = r; k !== d + pas; k += pas) out.push(k);
+  return out;
+}
+
+/** Corde à vide correspondant à un repère (pour sa couleur), s'il y en a une. */
+export const CORDE_DU_DEGRE: Record<number, 'do' | 'sol' | 're' | 'la'> = { 14: 'do', 18: 'sol', 22: 're', 26: 'la' };
