@@ -21,7 +21,21 @@ export interface Reglages {
   voixNoms: 'chantee' | 'parlee' | 'aucune';
   /** Palais des notes : une image et un mot par nom de note (do → si). */
   palais: ImageNote[];
+  /** Ce que l'exercice de lecture donne après une réponse (réglable dans l'exercice). */
+  retourLecture: RetourLecture;
 }
+
+export type OrdreSons = 'ensemble' | 'violon-nom' | 'nom-violon';
+export interface RetourLecture {
+  /** Entendre la note au violoncelle (et l'escalier depuis le repère après une erreur). */
+  violoncelle: boolean;
+  /** Quand le violoncelle et le nom sonnent tous les deux : ensemble ou l'un après l'autre. */
+  ordre: OrdreSons;
+  image: boolean;
+  mot: boolean;
+  manche: boolean;
+}
+export const RETOUR_LECTURE_DEFAUT: RetourLecture = { violoncelle: true, ordre: 'violon-nom', image: true, mot: true, manche: true };
 
 export interface ImageNote {
   image: string;
@@ -125,6 +139,7 @@ export const REGLAGES_DEFAUT: Reglages = {
   timbre: 'echantillons',
   voixNoms: 'chantee',
   palais: PALAIS_DEFAUT.map((x) => ({ ...x })),
+  retourLecture: { ...RETOUR_LECTURE_DEFAUT },
 };
 
 export function etatInitial(maintenant = Date.now()): Etat {
@@ -171,6 +186,14 @@ export function normaliser(brut: unknown): Etat | null {
     const x = Array.isArray(reglages.palais) ? (reglages.palais[i] as Partial<ImageNote> | undefined) : undefined;
     return { image: typeof x?.image === 'string' ? x.image.slice(0, 8) : d.image, mot: typeof x?.mot === 'string' ? x.mot.slice(0, 30) : d.mot };
   });
+  const rl = estObjet(reglages.retourLecture) ? reglages.retourLecture : {};
+  r.retourLecture = {
+    violoncelle: typeof rl.violoncelle === 'boolean' ? rl.violoncelle : RETOUR_LECTURE_DEFAUT.violoncelle,
+    ordre: rl.ordre === 'ensemble' || rl.ordre === 'violon-nom' || rl.ordre === 'nom-violon' ? rl.ordre : RETOUR_LECTURE_DEFAUT.ordre,
+    image: typeof rl.image === 'boolean' ? rl.image : RETOUR_LECTURE_DEFAUT.image,
+    mot: typeof rl.mot === 'boolean' ? rl.mot : RETOUR_LECTURE_DEFAUT.mot,
+    manche: typeof rl.manche === 'boolean' ? rl.manche : RETOUR_LECTURE_DEFAUT.manche,
+  };
   if (reglages.timbre === 'echantillons' || reglages.timbre === 'synthese') r.timbre = reglages.timbre;
   if (typeof reglages.dureeParDefaut === 'number' && reglages.dureeParDefaut >= 5 && reglages.dureeParDefaut <= 240) r.dureeParDefaut = reglages.dureeParDefaut;
   return {

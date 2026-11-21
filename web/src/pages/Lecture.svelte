@@ -10,6 +10,7 @@
   import { direNote } from '../lib/audio/voix';
   import { chanter } from '../lib/audio/chant';
   import { stockage } from '../lib/stockage.svelte';
+  import type { RetourLecture } from '../lib/etat';
   import { jouer } from '../lib/audio/son';
   import { CLES, CORDE_DU_DEGRE, cheminDepuisRepere, placeSurPortee, type Cle } from '../lib/musique/cles';
   import { deDegre, degre, midi, nomNote, type Note } from '../lib/musique/notes';
@@ -107,16 +108,13 @@
     etats = juste ? { [`${L}|${acc}`]: 'ok' } : { [`${L}|${acc}`]: 'faux' };
     const chemin = juste ? [degre(n)] : cheminDepuisRepere(degre(n), courant.clef);
     retour = { juste, nom: nomNote(n, style), place: placeSurPortee(n, courant.clef), chemin, choisi: L };
-    annoncer(n, juste ? 650 : (chemin.length - 1) * PAS_MS + 1150);
     if (juste) {
-      jouer(midi(n), 0.9);
-      setTimeout(() => { if (retour?.juste) suivant(); }, attenteJuste());
+      const fin = sonsNote(n, 0, 0.9);
+      setTimeout(() => { if (retour?.juste) suivant(); }, Math.max(1000, fin + 250));
     } else {
-      // On entend le chemin, du repère à la note, puis la note tenue.
-      chemin.forEach((d, k) => {
-        const m = k === chemin.length - 1 ? midi(n) : midi(deDegre(d));
-        jouer(m, k === chemin.length - 1 ? 1.1 : 0.32, { dans: (k * PAS_MS) / 1000 });
-      });
+      // On entend le chemin, du repère à la note, puis la note tenue (et son nom).
+      if (rl.violoncelle) chemin.slice(0, -1).forEach((d, k) => jouer(midi(deDegre(d)), 0.32, { dans: (k * PAS_MS) / 1000 }));
+      sonsNote(n, (chemin.length - 1) * PAS_MS, 1.1);
     }
   }
 
@@ -131,7 +129,7 @@
       return slots;
     }
     if (retour.juste) {
-      slots[SLOT_QUESTION] = { n: courant.note, etat: 'ok', morph: retour.nom, image: palais[courant.note.L]?.image, delai: -120 };
+      slots[SLOT_QUESTION] = { n: courant.note, etat: 'ok', morph: retour.nom, image: imageDe(courant.note.L), delai: -120 };
       return slots;
     }
     const ch = retour.chemin;
@@ -145,7 +143,7 @@
         n,
         etat: derniere ? 'faux' : premiere ? couleurRepere(d) : 'pas',
         morph: derniere ? retour!.nom : premiere ? nomD(d) : nomD(d).toLowerCase(),
-        image: derniere || premiere ? palais[n.L]?.image : undefined,
+        image: derniere || premiere ? imageDe(n.L) : undefined,
         petitMorph: !derniere && !premiere,
         petite: !derniere && !premiere,
         delai: derniere ? undefined : k * PAS_MS,
@@ -178,11 +176,30 @@
     const v = stockage.etat.reglages.voixNoms;
     if (v === 'chantee' && !question) chanter(midi(n), n.L, dansMs / 1000);
     else if (v !== 'aucune') {
-      const mot = stockage.etat.reglages.palais[n.L]?.mot;
+      const mot = motDe(n.L);
       direNote(nomNote(n, 'latin') + (mot && !question ? `, ${mot}` : ''), dansMs);
     }
   }
-  const attenteJuste = () => (stockage.etat.reglages.voixNoms === 'aucune' ? 1000 : 1700);
+  /** Ce que l'exercice donne après une réponse : réglable dans le panneau « Après ta réponse ». */
+  const rl = $derived(stockage.etat.reglages.retourLecture);
+  const imageDe = (L: number) => (rl.image ? palais[L]?.image : undefined);
+  const motDe = (L: number) => (rl.mot ? palais[L]?.mot : undefined);
+  function reglerRetour<K extends keyof RetourLecture>(k: K, v: RetourLecture[K]) {
+    stockage.regler('retourLecture', { ...rl, [k]: v });
+  }
+  /**
+   * Fait entendre une note à partir de tMs : au violoncelle et/ou par son nom, ensemble ou
+   * l'un après l'autre selon les choix. Renvoie l'heure (ms) où tout est fini.
+   */
+  function sonsNote(n: Note, tMs: number, dureeViolon: number): number {
+    const v = rl.violoncelle, nom = stockage.etat.reglages.voixNoms !== 'aucune';
+    let tv = tMs, tn = tMs;
+    if (v && nom && rl.ordre === 'violon-nom') tn = tMs + 750;
+    if (v && nom && rl.ordre === 'nom-violon') tv = tMs + 850;
+    if (v) jouer(midi(n), dureeViolon, { dans: tv / 1000 });
+    if (nom) annoncer(n, tn);
+    return Math.max(tMs + 400, v ? tv + dureeViolon * 1000 : 0, nom ? tn + 950 : 0);
+  }
 
   // ------------------------------------------------------------- manche et filigrane
   /** Corde, doigt et position de la note montrée (doigté le plus simple). */
@@ -223,19 +240,22 @@
     score.total++;
     if (bon) { score.justes++; score.serie++; } else score.serie = 0;
     retourP = { juste: bon, choisi: d };
-    jouer(midi(deDegre(d)), 0.5);
-    if (!bon) jouer(midi(c.note), 1.0, { dans: 0.6 });
-    annoncer(bon ? deDegre(d) : c.note, bon ? 600 : 1650);
-    if (bon) setTimeout(() => { if (retourP?.juste) suivantP(); }, attenteJuste());
+    if (bon) {
+      const fin = sonsNote(deDegre(d), 0, 0.9);
+      setTimeout(() => { if (retourP?.juste) suivantP(); }, Math.max(1000, fin + 250));
+    } else {
+      if (rl.violoncelle) jouer(midi(deDegre(d)), 0.5);
+      sonsNote(c.note, 600, 1.0);
+    }
   }
   const notesPlacer = $derived.by<(NotePortee | null)[]>(() => {
     const slots: (NotePortee | null)[] = Array(SLOTS).fill(null);
     if (!cibleP || !retourP) return slots;
     const ch = deDegre(retourP.choisi);
-    if (retourP.juste) slots[SLOT_QUESTION] = { n: ch, etat: 'ok', morph: nomD(retourP.choisi), image: palais[ch.L]?.image, delai: -120 };
+    if (retourP.juste) slots[SLOT_QUESTION] = { n: ch, etat: 'ok', morph: nomD(retourP.choisi), image: imageDe(ch.L), delai: -120 };
     else {
       slots[SLOT_QUESTION - 1] = { n: ch, etat: 'faux', morph: nomD(retourP.choisi).toLowerCase(), petitMorph: true, delai: -120 };
-      slots[SLOT_QUESTION + 1] = { n: cibleP.note, morph: nomD(cibleP.d), image: palais[cibleP.note.L]?.image, delai: 380 };
+      slots[SLOT_QUESTION + 1] = { n: cibleP.note, morph: nomD(cibleP.d), image: imageDe(cibleP.note.L), delai: 380 };
     }
     return slots;
   });
@@ -337,16 +357,18 @@
     {:else if mode === 'placer'}
       {#if cibleP}
         {@const dgp = retourP ? doigteDe(retourP.juste ? deDegre(retourP.choisi) : cibleP.note) : null}
-        <p class="question">Place <span class="nom-note" style={`color:var(--n${cibleP.note.L})`}>{nomD(cibleP.d)}</span> <span class="image-note">{palais[cibleP.note.L]?.image}</span> sur la portée</p>
+        <p class="question">Place <span class="nom-note" style={`color:var(--n${cibleP.note.L})`}>{nomD(cibleP.d)}</span> <span class="image-note">{imageDe(cibleP.note.L)}</span> sur la portée</p>
         <div class="scene">
           <div class="portee-grande seule">
             <Portee notes={notesPlacer} cle={clef} nomCle={false} opaciteAides={opaciteDe(cibleP.cle)} espacement={64} hauteur={164}
               onplace={placer} xPlace={SLOT_QUESTION} titre="Portée : touche une ligne ou un interligne" />
           </div>
-          <div class="mini-manche" class:vide={!dgp}>
-            <Manche marques={dgp ? [dgp.marque] : []} cadre={dgp?.cadre ?? null} hauteur="270px" titre="Où jouer cette note" />
-            <p class="discret">{dgp ? dgp.texte : 'Corde et doigt après ta réponse'}</p>
-          </div>
+          {#if rl.manche}
+            <div class="mini-manche" class:vide={!dgp}>
+              <Manche marques={dgp ? [dgp.marque] : []} cadre={dgp?.cadre ?? null} hauteur="270px" titre="Où jouer cette note" />
+              <p class="discret">{dgp ? dgp.texte : 'Corde et doigt après ta réponse'}</p>
+            </div>
+          {/if}
         </div>
         <div class={`retour ${retourP ? (retourP.juste ? 'r-ok' : 'r-faux') : ''}`} aria-live="polite">
           {#if retourP?.juste}
@@ -371,17 +393,19 @@
         <div class="portee-grande seule">
           <Portee notes={notePortee} cle={courant.clef} nomCle={false} opaciteAides={opaciteDe(courant.cle)} espacement={64} hauteur={164} />
         </div>
-        <div class="mini-manche" class:vide={!dg}>
-          <Manche marques={dg ? [dg.marque] : []} cadre={dg?.cadre ?? null} hauteur="270px" titre="Où jouer cette note" />
-          <p class="discret">{dg ? dg.texte : 'Corde et doigt après ta réponse'}</p>
-        </div>
+        {#if rl.manche}
+          <div class="mini-manche" class:vide={!dg}>
+            <Manche marques={dg ? [dg.marque] : []} cadre={dg?.cadre ?? null} hauteur="270px" titre="Où jouer cette note" />
+            <p class="discret">{dg ? dg.texte : 'Corde et doigt après ta réponse'}</p>
+          </div>
+        {/if}
       </div>
       {#if mode === 'revisions'}<p class="discret">{CLES[courant.clef].label}</p>{/if}
       <div class={`retour ${retour ? (retour.juste ? 'r-ok' : 'r-faux') : ''}`} aria-live="polite">
         {#if retour?.juste}
-          <p class="grand bien">Oui : <span class="nom-note" style={`color:var(--n${courant.note.L})`}>{retour.nom}</span> <span class="image-note">{palais[courant.note.L]?.image} {palais[courant.note.L]?.mot}</span></p>
+          <p class="grand bien">Oui : <span class="nom-note" style={`color:var(--n${courant.note.L})`}>{retour.nom}</span> <span class="image-note">{imageDe(courant.note.L)} {motDe(courant.note.L)}</span></p>
         {:else if retour}
-          <p class="grand mal">C’est <span class="nom-note" style={`color:var(--n${courant.note.L})`}>{retour.nom}</span> <span class="image-note">{palais[courant.note.L]?.image} {palais[courant.note.L]?.mot}</span> <span class="place">({retour.place})</span></p>
+          <p class="grand mal">C’est <span class="nom-note" style={`color:var(--n${courant.note.L})`}>{retour.nom}</span> <span class="image-note">{imageDe(courant.note.L)} {motDe(courant.note.L)}</span> <span class="place">({retour.place})</span></p>
           <p class="chemin">{texteChemin}</p>
         {:else}
           <p class="discret">Quelle est cette note ?</p>
@@ -402,11 +426,49 @@
     {/if}
   </section>
 
+  <div class="colonne">
   <aside class="carte reperes">
     <p class="etiquette">Repères en {CLES[courant?.clef ?? clef].label}</p>
     <Portee notes={CLES[courant?.clef ?? clef].reperes.map((d) => ({ n: deDegre(d), etiquette: nomD(d), etat: retour && !retour.juste && retour.chemin[0] === d ? couleurRepere(d) : undefined }))} cle={courant?.clef ?? clef} aides espacement={56} hauteur={190} />
     <p class="discret">Lis par écart : trouve le repère le plus proche, puis compte les lignes et les interlignes.</p>
   </aside>
+  {#if mode !== 'suite'}
+    <section class="carte sens" aria-label="Après ta réponse">
+      <p class="etiquette">Après ta réponse</p>
+      <div class="ligne-sens">
+        <span>Son</span>
+        <button class="puce" aria-pressed={rl.violoncelle} onclick={() => reglerRetour('violoncelle', !rl.violoncelle)}>🎻 Violoncelle</button>
+      </div>
+      <div class="ligne-sens">
+        <span>Nom</span>
+        <div class="seg petit" role="group" aria-label="Nom de la note">
+          <button aria-pressed={stockage.etat.reglages.voixNoms === 'chantee'} onclick={() => stockage.regler('voixNoms', 'chantee')}>Chanté</button>
+          <button aria-pressed={stockage.etat.reglages.voixNoms === 'parlee'} onclick={() => stockage.regler('voixNoms', 'parlee')}>Dit</button>
+          <button aria-pressed={stockage.etat.reglages.voixNoms === 'aucune'} onclick={() => stockage.regler('voixNoms', 'aucune')}>Muet</button>
+        </div>
+      </div>
+      {#if rl.violoncelle && stockage.etat.reglages.voixNoms !== 'aucune'}
+        <div class="ligne-sens">
+          <span>Ordre</span>
+          <div class="seg petit" role="group" aria-label="Ordre des sons">
+            <button aria-pressed={rl.ordre === 'ensemble'} onclick={() => reglerRetour('ordre', 'ensemble')}>Ensemble</button>
+            <button aria-pressed={rl.ordre === 'violon-nom'} onclick={() => reglerRetour('ordre', 'violon-nom')}>🎻 puis nom</button>
+            <button aria-pressed={rl.ordre === 'nom-violon'} onclick={() => reglerRetour('ordre', 'nom-violon')}>Nom puis 🎻</button>
+          </div>
+        </div>
+      {/if}
+      <div class="ligne-sens">
+        <span>Voir</span>
+        <div class="puces">
+          <button class="puce" aria-pressed={rl.image} onclick={() => reglerRetour('image', !rl.image)}>{palais[0]?.image} Image</button>
+          <button class="puce" aria-pressed={rl.mot} onclick={() => reglerRetour('mot', !rl.mot)}>Mot</button>
+          <button class="puce" aria-pressed={rl.manche} onclick={() => reglerRetour('manche', !rl.manche)}>Manche</button>
+        </div>
+      </div>
+      <button class="btn discret-btn" onclick={() => sonsNote((mode === 'placer' ? cibleP?.note : courant?.note) ?? deDegre(18), 0, 0.9)}>▶ Essayer</button>
+    </section>
+  {/if}
+  </div>
 </div>
 
 <style>
@@ -447,4 +509,14 @@
   .stats { display: flex; gap: 1.4rem; font: .82rem var(--f-mono); color: var(--ink-soft); border-top: 1px solid var(--rule); padding-top: .6rem; }
   .stats b { color: var(--ink); font-weight: 500; }
   .reperes p { margin: .3rem 0; }
+  .colonne { display: flex; flex-direction: column; gap: 1rem; }
+  .sens { display: flex; flex-direction: column; gap: .5rem; }
+  .sens .etiquette { margin: 0; }
+  .ligne-sens { display: flex; align-items: center; gap: .6rem; flex-wrap: wrap; }
+  .ligne-sens > span { min-width: 3.2rem; color: var(--ink-soft); font-size: .9rem; }
+  .puces { display: flex; flex-wrap: wrap; gap: 6px; }
+  .puce { appearance: none; font: inherit; font-size: .88rem; font-weight: 700; padding: .3em .75em; border-radius: 999px; border: 1px solid var(--rule); background: var(--surface); color: var(--ink-soft); cursor: pointer; text-decoration: line-through; opacity: .7; }
+  .puce[aria-pressed='true'] { text-decoration: none; opacity: 1; color: var(--ink); border-color: var(--ink-soft); background: color-mix(in srgb, var(--ink) 6%, var(--surface)); }
+  .seg.petit button { font-size: .85rem; padding: .3em .7em; }
+  .sens .discret-btn { align-self: flex-start; }
 </style>

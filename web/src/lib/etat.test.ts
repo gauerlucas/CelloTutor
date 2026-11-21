@@ -68,4 +68,12 @@ describe('voix et palais des notes', () => {
     expect(r.palais[0]).toEqual({ image: '🎻', mot: 'violoncelle' });
     expect(r.palais[2]!.mot).toBe('miel');
   });
+  it('choix du retour de lecture : défauts pour un ancien état, valeurs gardées sinon', () => {
+    const e = etatInitial(0) as unknown as Record<string, Record<string, unknown>>;
+    delete e.reglages!.retourLecture;
+    expect(normaliser(JSON.parse(JSON.stringify(e)))!.reglages.retourLecture).toEqual({ violoncelle: true, ordre: 'violon-nom', image: true, mot: true, manche: true });
+    e.reglages!.retourLecture = { violoncelle: false, ordre: 'ensemble', image: false, mot: 'oui' };
+    const r = normaliser(JSON.parse(JSON.stringify(e)))!.reglages.retourLecture;
+    expect(r).toEqual({ violoncelle: false, ordre: 'ensemble', image: false, mot: true, manche: true });
+  });
 });
