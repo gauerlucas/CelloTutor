@@ -11,12 +11,12 @@
   import { micro } from '../lib/audio/micro.svelte';
   import { jouer } from '../lib/audio/son';
   import { CORDES, POSITIONS, doigtPour, libellePosition, position, type Doigt } from '../lib/musique/violoncelle';
-  import { deMidi, nomNote, memeNom } from '../lib/musique/notes';
+  import { deMidi, nomNote, memeNom, type Note } from '../lib/musique/notes';
   import { cleConseillee, type Cle } from '../lib/musique/cles';
   import {
-    clesPosition, demanchesDe, gammeDePosition, itemsPosition, jugerArrivee, TRAJETS, type Demanche, type ItemCase,
+    aideCase, clesPosition, demanchesDe, gammeDePosition, itemsPosition, jugerArrivee, TRAJETS, type Demanche, type ItemCase,
   } from '../lib/exercices/positions';
-  import { apresReponse, choisir, enregistrerReponse, maitrise, nouvelleFile, proposerRecord } from '../lib/revision';
+  import { apresReponse, choisir, enregistrerReponse, maitrise, nouvelleFile, proposerRecord, REPONSE_RAPIDE_MS } from '../lib/revision';
 
   type Mode = 'explorer' | 'nom' | 'trouve' | 'demanche';
   let { modeInitial = 'explorer', posInitiale = '1', trajetInitial = null }: { modeInitial?: Mode; posInitiale?: string; trajetInitial?: [string, string] | null } = $props();
@@ -70,6 +70,7 @@
     const pool = itemsPosition(mode === 'nom' ? 'nom' : 'trouve', posId, alterations);
     courant = choisir(pool, stockage.etat, file);
     retour = null;
+    niveauAide = 0;
     etatsChoix = {};
     marqueReponse = null;
     debut = performance.now();
@@ -77,7 +78,8 @@
 
   function repondre(juste: boolean, texte: string) {
     if (!courant || retour) return;
-    const ms = performance.now() - debut;
+    // avec l'aide, la réponse compte mais ne fait pas monter la case de boîte
+    const ms = niveauAide > 0 ? Math.max(performance.now() - debut, REPONSE_RAPIDE_MS + 1) : performance.now() - debut;
     enregistrerReponse(stockage.etat, courant.cle, juste, ms);
     apresReponse(file, courant.cle, juste);
     score.total++;
@@ -92,8 +94,19 @@
     } else score.serie = 0;
     stockage.modifie();
     retour = { juste, texte };
+    if (!juste && mode === 'nom') niveauAide = 2; // l'erreur ouvre l'explication complète
     jouer(courant.midi, 0.9);
     if (juste) setTimeout(() => { if (retour?.juste) suivant(); }, 900);
+  }
+
+  // ------------------------------------------------------------- aide : logique de la position
+  let niveauAide = $state(0); // 0 fermée, 1 repère, 2 chemin case par case
+  const aide = $derived(courant && mode === 'nom' ? aideCase(pos, courant.corde, courant.demiTons) : null);
+  const nomN = (n: Note) => nomNote(n, style);
+  const ORD = ['à vide', '1re', '2e', '3e', '4e', '5e', '6e', '7e'];
+  function toucheAide(e: KeyboardEvent) {
+    if (mode !== 'nom' || retour || e.target instanceof HTMLInputElement) return;
+    if (e.key === 'h' || e.key === 'H' || e.key === '?') niveauAide = Math.min(2, niveauAide + 1);
   }
 
   function choixNom(L: number, acc: number) {
@@ -269,6 +282,52 @@
         {#if mode === 'nom'}
           <p class="consigne">Quelle note joue le <b>{nomDoigt(courant.doigt)}</b> sur la corde de <b style={`color:${CORDES[courant.corde]!.couleur}`}>{CORDES[courant.corde]!.nom}</b> en {pos.label} ?</p>
           <ChoixNote {style} {alterations} etats={etatsChoix} desactive={!!retour} onchoix={choixNom} />
+          {#if aide}
+            {@const corde = CORDES[courant.corde]!}
+            {@const cible = courant.demiTons}
+            <div class="aide-pos">
+              {#if niveauAide === 0 && !retour}
+                <button class="btn discret-btn" onclick={() => (niveauAide = 1)}>💡 Aide : comment trouver ? <span class="discret">(touche H)</span></button>
+              {:else}
+                <ol class="etapes-aide">
+                  <li>
+                    <b>Le repère de la position.</b>
+                    {#if pos.id === 'demi'}
+                      La demi-position, c’est une seule case au-dessus de la corde à vide : {corde.nom} → <b>{nomN(aide.repere)}</b> sous le 1er doigt.
+                    {:else if pos.pouce}
+                      Le pouce se pose à l’octave de la corde à vide, au milieu de la corde (là où sonne l’harmonique) : <b>{nomN(aide.repere)}</b> aigu.
+                    {:else}
+                      Récite les notes depuis la corde à vide, une par position :
+                      <span class="recit">{#each aide.recit as n, k (k)}<span class="pas-recit" class:fin={k === aide.recit.length - 1}>{nomN(n)}<small>{ORD[k]}</small></span>{/each}</span>
+                      {#if aide.correction === 0}
+                        En {pos.label}, ton 1er doigt est sur <b>{nomN(aide.repere)}</b>.
+                      {:else}
+                        En {pos.label}, le 1er doigt tombe une case {aide.correction < 0 ? 'avant' : 'après'} {nomN(aide.recit[aide.recit.length - 1]!)} : <b>{nomN(aide.repere)}</b>.
+                      {/if}
+                    {/if}
+                  </li>
+                  {#if niveauAide >= 2 || retour}
+                    <li>
+                      <b>Puis case par case.</b> Chaque doigt avance d’une case, c’est-à-dire d’un demi-ton :
+                      {#each aide.chemin as c, k (k)}{k ? ' → ' : ''}<span class="pas-chemin" class:cible={c.demiTons === cible}>{c.doigt === 'p' ? 'pouce' : c.doigt ? `doigt ${c.doigt}` : 'case'} = {c.demiTons === cible && !retour ? '?' : nomN(c.note)}</span>{/each}
+                    </li>
+                  {:else}
+                    <li><button class="btn discret-btn" onclick={() => (niveauAide = 2)}>Montre la suite, case par case</button></li>
+                  {/if}
+                </ol>
+                <div class="echelle" style={`--c:${corde.couleur}`} aria-label={`Corde de ${corde.nom}, case par case`}>
+                  {#each aide.echelle as c (c.demiTons)}
+                    {@const montre = niveauAide >= 2 || !!retour || c.demiTons === 0 || c.demiTons === pos.ff}
+                    <div class="case-ech" class:main={c.doigt !== null} class:naturel={c.note.acc === 0} class:cible={c.demiTons === cible}>
+                      <span class="doigt-ech">{c.demiTons === 0 ? 'à vide' : c.doigt === 'p' ? 'P' : (c.doigt ?? '')}</span>
+                      <span class="nom-ech">{c.demiTons === cible && !retour ? '?' : montre ? nomN(c.note) : '·'}</span>
+                    </div>
+                  {/each}
+                </div>
+                <p class="discret">Sur une corde, chaque case est un demi-ton. Entre deux notes voisines il y a toujours une case de plus (un dièse ou un bémol), sauf entre <b>Mi–Fa</b> et <b>Si–Do</b>, qui se touchent.</p>
+              {/if}
+            </div>
+          {/if}
         {:else}
           <p class="consigne">Où joues-tu cette note en <b>{pos.label}</b> ? Touche le manche.</p>
           <Portee notes={[{ n: courant.note, etat: retour ? (retour.juste ? 'ok' : 'faux') : undefined }]} cle={cleExercice} largeurMin={320} />
@@ -335,7 +394,26 @@
   </div>
 </div>
 
+<svelte:window onkeydown={toucheAide} />
+
 <style>
+  .aide-pos { display: flex; flex-direction: column; gap: .6rem; border-top: 1px dashed var(--rule); padding-top: .8rem; }
+  .aide-pos .discret-btn { align-self: flex-start; }
+  .etapes-aide { margin: 0; padding-left: 1.3rem; display: flex; flex-direction: column; gap: .5rem; line-height: 1.6; }
+  .recit { display: inline-flex; flex-wrap: wrap; gap: 4px; margin: 0 .3rem; vertical-align: middle; }
+  .pas-recit { display: inline-flex; flex-direction: column; align-items: center; line-height: 1.1; padding: .15rem .45rem; border: 1px solid var(--rule); border-radius: 7px; font-weight: 700; }
+  .pas-recit small { font-weight: 400; font-size: .7rem; color: var(--ink-soft); }
+  .pas-recit.fin { border-color: var(--accent); background: var(--accent-soft); }
+  .pas-chemin { font-weight: 700; white-space: nowrap; }
+  .pas-chemin.cible { color: var(--accent); }
+  .echelle { display: flex; overflow-x: auto; border: 2px solid var(--c); border-radius: 8px; }
+  .case-ech { flex: 1 0 2.6rem; display: flex; flex-direction: column; align-items: center; padding: .25rem .1rem; border-right: 1px solid var(--rule); background: var(--surface); }
+  .case-ech:last-child { border-right: 0; }
+  .case-ech.main { background: color-mix(in srgb, var(--c) 12%, var(--surface)); }
+  .case-ech.cible { outline: 3px solid var(--accent); outline-offset: -3px; }
+  .doigt-ech { font: .72rem var(--f-mono); color: var(--ink-soft); min-height: 1em; }
+  .nom-ech { font-size: .8rem; color: var(--ink-soft); }
+  .case-ech.naturel .nom-ech { font-size: 1rem; font-weight: 800; color: var(--ink); }
   .disposition { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 1.5rem; align-items: start; }
   @media (max-width: 900px) { .disposition { grid-template-columns: minmax(0, 1fr); } }
   @media (min-width: 901px) { .droite { position: sticky; top: 6.5rem; } }
