@@ -34,6 +34,9 @@
     hauteur = 168,
     titre,
     nomCle = true,
+    opaciteAides = 0,
+    onplace,
+    xPlace = null,
     onnote,
   }: {
     notes?: (NotePortee | null)[];
@@ -45,6 +48,12 @@
     hauteur?: number;
     titre?: string;
     nomCle?: boolean;
+    /** Lignes des cordes à vide en couleur, en filigrane (0 = aucune, 1 = pleines). */
+    opaciteAides?: number;
+    /** Rend chaque ligne et interligne cliquable (exercice « placer la note »). */
+    onplace?: (d: number) => void;
+    /** Colonne (indice de note) où apparaît la note fantôme au survol. */
+    xPlace?: number | null;
     onnote?: (i: number) => void;
   } = $props();
 
@@ -73,6 +82,17 @@
     <line class={`ligne ${corde ? 'repere c-' + corde : ''}`} x1="4" x2={L - 6} y1={bas - i * s} y2={bas - i * s} />
     {#if corde}<text class={`lab c-${corde}`} x="6" y={bas - i * s - 3}>{NOM_CORDE[corde]}</text>{/if}
   {/each}
+  {#if opaciteAides > 0}
+    <g class="filigrane" style={`opacity:${opaciteAides}`}>
+      {#each Object.entries(CORDE_PAR_DEGRE) as [dd, corde] (dd)}
+        {@const d = Number(dd)}
+        {#if d >= b - 6 && d <= b + 14}
+          <line class={`ligne repere c-${corde} ${d < b || d > b + 8 ? 'pointille' : ''}`} x1={x0 - 8} x2={L - 6} y1={y(d)} y2={y(d)} />
+          <text class={`lab c-${corde}`} x="6" y={y(d) - 3}>{NOM_CORDE[corde]}</text>
+        {/if}
+      {/each}
+    </g>
+  {/if}
  {#if nomCle}<text class="nom-cle" x={L - 8} y="12" text-anchor="end">{CLES[cle].label}</text>{/if}
   {#if cle === 'fa'}
     <circle class="plein" cx="38" cy={bas - 42} r="6" />
@@ -116,6 +136,17 @@
       {/if}
     {/if}
   {/each}
+  {#if onplace}
+    {@const xf = x0 + (xPlace ?? 0) * espacement + espacement / 2}
+    {#each Array.from({ length: 21 }, (_, i) => b - 6 + i) as d (d)}
+      <g class="place">
+        {#each lignesSupp(d) as k (k)}<line class="ligne fantome-l" x1={xf - 14} x2={xf + 14} y1={y(k)} y2={y(k)} />{/each}
+        <ellipse class="tete fantome-t" cx={xf} cy={y(d)} rx="8.6" ry="6.2" transform={`rotate(-22 ${xf} ${y(d)})`} />
+        <rect class="zone-place" x={x0} y={y(d) - s / 4} width={L - x0 - 6} height={s / 2} role="button" tabindex="-1" aria-label={`Position ${d - b}`}
+          onclick={() => onplace(d)} onkeydown={(e) => e.key === 'Enter' && onplace(d)} />
+      </g>
+    {/each}
+  {/if}
 </svg>
 
 <style>
@@ -157,6 +188,11 @@
   @media (prefers-reduced-motion: reduce) { .apparait { animation: none; opacity: 1; } }
   .etiq { font: 700 12px var(--f-body); fill: var(--ink-soft); }
   .curseur { fill: var(--accent-soft); }
+  .pointille { stroke-dasharray: 5 4; }
+  .place .fantome-t, .place .fantome-l { opacity: 0; pointer-events: none; }
+  .place:hover .fantome-t { opacity: .45; fill: var(--accent); }
+  .place:hover .fantome-l { opacity: .6; }
+  .zone-place { fill: transparent; cursor: pointer; outline: none; }
   .zone { fill: transparent; cursor: pointer; }
   .zone:hover { fill: var(--accent); opacity: .06; }
 </style>

@@ -17,6 +17,8 @@ export interface Reglages {
   tenueMicro: 'courte' | 'normale' | 'longue';
   /** Son des notes jouées par l'appli : enregistrements de violoncelle ou synthèse. */
   timbre: 'echantillons' | 'synthese';
+  /** Dire à voix haute le nom des notes dans les exercices de lecture. */
+  direNoms: boolean;
 }
 
 /** État de répétition espacée d'un exercice (boîtes 0 → 5, comme dans l'ébauche B). */
@@ -104,6 +106,7 @@ export const REGLAGES_DEFAUT: Reglages = {
   dureeParDefaut: 60,
   tenueMicro: 'normale',
   timbre: 'echantillons',
+  direNoms: true,
 };
 
 export function etatInitial(maintenant = Date.now()): Etat {
@@ -144,6 +147,7 @@ export function normaliser(brut: unknown): Etat | null {
   if (reglages.nomsNotes === 'latin' || reglages.nomsNotes === 'anglo') r.nomsNotes = reglages.nomsNotes;
   if (typeof reglages.volume === 'number' && reglages.volume >= 0 && reglages.volume <= 1) r.volume = reglages.volume;
   if (reglages.tenueMicro === 'courte' || reglages.tenueMicro === 'normale' || reglages.tenueMicro === 'longue') r.tenueMicro = reglages.tenueMicro;
+  if (typeof reglages.direNoms === 'boolean') r.direNoms = reglages.direNoms;
   if (reglages.timbre === 'echantillons' || reglages.timbre === 'synthese') r.timbre = reglages.timbre;
   if (typeof reglages.dureeParDefaut === 'number' && reglages.dureeParDefaut >= 5 && reglages.dureeParDefaut <= 240) r.dureeParDefaut = reglages.dureeParDefaut;
   return {

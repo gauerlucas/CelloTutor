@@ -77,6 +77,11 @@
     </select>
   </label>
   <label class="ligne">
+    <span class="etiquette">Nom des notes à voix haute</span>
+    <input type="checkbox" checked={r.direNoms} onchange={(e) => stockage.regler('direNoms', e.currentTarget.checked)} />
+    <span class="discret">dans les exercices de lecture</span>
+  </label>
+  <label class="ligne">
     <span class="etiquette">Volume</span>
     <input type="range" min="0" max="1" step="0.05" value={r.volume} onchange={(e) => stockage.regler('volume', Number(e.currentTarget.value))} />
     <span class="discret">{Math.round(r.volume * 100)} %</span>

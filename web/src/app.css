@@ -4,8 +4,8 @@
   --rule: #d6dbd3; --accent: #2b4a7d; --accent-soft: #e2e8f3; --on-accent: #ffffff;
   --good: #28764a; --good-bg: #e2f1e7; --warn: #a56a10; --warn-bg: #f8edd6; --bad: #ad3429;
   --s-do: #8a5a2a; --s-sol: #237866; --s-re: #7450a2; --s-la: #bd5427;
-  /* une couleur par nom de note (do → si), pour l'associer à sa place sur la portée */
-  --n0: #d0342c; --n1: #e06c00; --n2: #a87c00; --n3: #2e8540; --n4: #00838f; --n5: #3a4fb8; --n6: #9030a8;
+  /* une couleur par nom de note (do → si) ; do, ré, sol, la reprennent la couleur de leur corde à vide */
+  --n0: var(--s-do); --n1: var(--s-re); --n2: #a87c00; --n3: #2f6fd0; --n4: var(--s-sol); --n5: var(--s-la); --n6: #c2307a;
   --f-display: "Bodoni Moda", Didot, Georgia, serif;
   --f-body: "Atkinson Hyperlegible", system-ui, -apple-system, "Segoe UI", sans-serif;
   --f-mono: ui-monospace, "Cascadia Mono", Consolas, monospace;
@@ -17,7 +17,7 @@
     --rule: #2e353d; --accent: #8fb1ea; --accent-soft: #243149; --on-accent: #0f1520;
     --good: #6cc991; --good-bg: #1d3327; --warn: #e2b25a; --warn-bg: #3a2f18; --bad: #f08376;
     --s-do: #d39d64; --s-sol: #5ec3ac; --s-re: #b892e3; --s-la: #ef9461;
-    --n0: #ff7b72; --n1: #ffa657; --n2: #e3c048; --n3: #6fd38a; --n4: #4fd1dc; --n5: #8ea2ff; --n6: #d58cf0;
+    --n0: var(--s-do); --n1: var(--s-re); --n2: #e3c048; --n3: #7fb0ff; --n4: var(--s-sol); --n5: var(--s-la); --n6: #f080b8;
     color-scheme: dark;
   }
 }
@@ -26,7 +26,7 @@
   --rule: #2e353d; --accent: #8fb1ea; --accent-soft: #243149; --on-accent: #0f1520;
   --good: #6cc991; --good-bg: #1d3327; --warn: #e2b25a; --warn-bg: #3a2f18; --bad: #f08376;
   --s-do: #d39d64; --s-sol: #5ec3ac; --s-re: #b892e3; --s-la: #ef9461;
-  --n0: #ff7b72; --n1: #ffa657; --n2: #e3c048; --n3: #6fd38a; --n4: #4fd1dc; --n5: #8ea2ff; --n6: #d58cf0;
+  --n0: var(--s-do); --n1: var(--s-re); --n2: #e3c048; --n3: #7fb0ff; --n4: var(--s-sol); --n5: var(--s-la); --n6: #f080b8;
   color-scheme: dark;
 }
 
