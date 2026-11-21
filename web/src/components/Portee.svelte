@@ -6,6 +6,12 @@
     etat?: string;
     etiquette?: string;
     couleurEtiquette?: string;
+    /** Nom écrit juste à droite de la tête de note (là où l'œil regarde). */
+    nom?: string;
+    /** Petite tête (notes de passage d'un chemin). */
+    petite?: boolean;
+    /** Apparition retardée (ms), pour dérouler un chemin note à note. */
+    delai?: number;
   }
 </script>
 
@@ -80,12 +86,18 @@
       {@const d = degre(it.n)}
       {@const cx = x0 + j * espacement + espacement / 2}
       {@const cy = y(d)}
+      {@const anim = it.delai != null ? `animation-delay:${it.delai}ms` : ''}
+      <g class={it.delai != null ? 'apparait' : ''} style={anim}>
       {#each lignesSupp(d) as k (k)}
         {@const corde = aides ? CORDE_PAR_DEGRE[k] : undefined}
         <line class={`ligne ${corde ? 'repere c-' + corde : ''}`} x1={cx - 14} x2={cx + 14} y1={y(k)} y2={y(k)} />
       {/each}
       {#if it.n.acc}<text class={`alt ${it.etat ?? ''}`} x={cx - 13} y={cy + 7} text-anchor="end">{symboleAlteration(it.n.acc)}</text>{/if}
-      <ellipse class={`tete ${it.etat ?? ''}`} {cx} {cy} rx="8.6" ry="6.2" transform={`rotate(-22 ${cx} ${cy})`} />
+      <ellipse class={`tete ${it.etat ?? ''}`} {cx} {cy} rx={it.petite ? 6.4 : 8.6} ry={it.petite ? 4.6 : 6.2} transform={`rotate(-22 ${cx} ${cy})`} />
+      {#if it.nom}
+        <text class={`nom ${it.etat ?? ''} ${it.petite ? 'petit' : ''}`} x={cx + (it.petite ? 9 : 12)} y={cy - (it.petite ? 7 : 9)}>{it.nom}</text>
+      {/if}
+      </g>
       {#if it.etiquette}<text class="etiq" x={cx} y={hauteur - 5} text-anchor="middle" style={it.couleurEtiquette ? `fill:${it.couleurEtiquette}` : ''}>{it.etiquette}</text>{/if}
       {#if onnote}
         <rect class="zone" x={cx - espacement / 2} y="0" width={espacement} height={hauteur} role="button" tabindex="0" aria-label={`Note ${j + 1}`}
@@ -113,6 +125,18 @@
   .tete.faux, .alt.faux { fill: var(--bad); }
   .tete.cible, .alt.cible { fill: var(--accent); }
   .tete.fantome { fill: none; stroke: var(--ink-soft); stroke-width: 1.4; stroke-dasharray: 3 2; }
+  .tete.pas { fill: var(--ink-soft); }
+  .tete.rep-do { fill: var(--s-do); } .tete.rep-sol { fill: var(--s-sol); }
+  .tete.rep-re { fill: var(--s-re); } .tete.rep-la { fill: var(--s-la); }
+  .tete.rep-autre { fill: var(--accent); }
+  .nom { font: 700 17px var(--f-body); fill: var(--ink); paint-order: stroke; stroke: var(--surface); stroke-width: 4px; }
+  .nom.petit { font-size: 12px; font-weight: 600; fill: var(--ink-soft); }
+  .nom.faux, .nom.ok { font-size: 22px; }
+  .nom.faux { fill: var(--bad); } .nom.ok { fill: var(--good); }
+  .nom.rep-do { fill: var(--s-do); } .nom.rep-sol { fill: var(--s-sol); } .nom.rep-re { fill: var(--s-re); } .nom.rep-la { fill: var(--s-la); } .nom.rep-autre { fill: var(--accent); }
+  .apparait { opacity: 0; animation: apparait .25s ease-out forwards; }
+  @keyframes apparait { from { opacity: 0; transform: translateY(3px); } to { opacity: 1; transform: none; } }
+  @media (prefers-reduced-motion: reduce) { .apparait { animation: none; opacity: 1; } }
   .etiq { font: 700 12px var(--f-body); fill: var(--ink-soft); }
   .curseur { fill: var(--accent-soft); }
   .zone { fill: transparent; cursor: pointer; }

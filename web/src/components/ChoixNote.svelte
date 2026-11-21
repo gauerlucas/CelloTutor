@@ -7,12 +7,15 @@
     alterations = false,
     etats = {},
     desactive = false,
+    attendu = null,
     onchoix,
   }: {
     style?: StyleNoms;
     alterations?: boolean;
     etats?: Record<string, 'ok' | 'faux'>;
     desactive?: boolean;
+    /** Après une erreur : seule la bonne réponse reste active, à rejouer pour continuer. */
+    attendu?: number | null;
     onchoix: (L: number, acc: number) => void;
   } = $props();
 
@@ -23,6 +26,7 @@
     if (desactive || (e.target as HTMLElement)?.tagName === 'INPUT') return;
     const i = '1234567'.indexOf(e.key);
     if (i >= 0) {
+      if (attendu != null && i !== attendu) return;
       onchoix(i, alterations ? alt : 0);
       alt = 0;
     }
@@ -41,7 +45,8 @@
   {/if}
   <div class="notes">
     {#each noms as n, i (i)}
-      <button class={`btn ${etats[`${i}|${alterations ? alt : 0}`] ?? ''}`} disabled={desactive}
+      <button class={`btn ${etats[`${i}|${alterations ? alt : 0}`] ?? ''} ${attendu === i ? 'attendu' : ''} ${attendu != null && attendu !== i ? 'eteint' : ''}`}
+        disabled={desactive || (attendu != null && attendu !== i)}
         onclick={() => { onchoix(i, alterations ? alt : 0); alt = 0; }}>
         <small>{i + 1}</small>{n}{alterations ? symboleAlteration(alt) : ''}
       </button>
@@ -56,5 +61,10 @@
   .notes small { position: absolute; top: 3px; left: 6px; font: .64rem var(--f-mono); color: var(--ink-soft); }
   .btn.ok { background: var(--good-bg); border-color: var(--good); color: var(--good); }
   .btn.faux { background: #f7e2de; border-color: var(--bad); color: var(--bad); }
+  .btn.attendu { background: var(--good-bg); border: 2px solid var(--good); color: var(--good); font-weight: 800; font-size: 1.2rem; animation: appel 1.1s ease-in-out infinite; }
+  .btn.eteint:not(.faux) { opacity: .35; }
+  .btn.eteint.faux { opacity: .8; text-decoration: line-through; }
+  @keyframes appel { 0%, 100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--good) 45%, transparent); } 50% { box-shadow: 0 0 0 6px color-mix(in srgb, var(--good) 0%, transparent); } }
+  @media (prefers-reduced-motion: reduce) { .btn.attendu { animation: none; } }
   @media (hover: none) { .notes small { display: none; } }
 </style>
